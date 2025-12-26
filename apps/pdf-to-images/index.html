@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Images - AI Showcase</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.05);
+        }
+        .drop-zone-text { color: #888; font-size: 1.1rem; }
+        .drop-zone-hint { color: #555; font-size: 0.85rem; margin-top: 8px; }
+        input[type="file"] { display: none; }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:hover { background: rgba(78, 205, 196, 0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.secondary {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            color: #888;
+        }
+        button.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        button.primary {
+            background: rgba(78, 205, 196, 0.3);
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+        .spacer { flex: 1; }
+        .options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option-group label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        select, input[type="number"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        input[type="number"] { width: 80px; }
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+        .page-preview {
+            aspect-ratio: 8.5/11;
+            background: #1a1a1f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .page-preview canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .page-info {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .page-number { font-size: 0.85rem; color: #888; }
+        .download-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .download-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 8px;
+            color: #4ecdc4;
+            display: none;
+        }
+        .status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+        .status.show { display: block; }
+        .hidden { display: none !important; }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4ecdc4;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>PDF to Images</h1>
+        <p class="subtitle">Convert PDF pages to high-quality images.</p>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
+            <div class="drop-zone-hint">Select a PDF to convert to images</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+
+        <div class="hidden" id="editorPanel">
+            <div class="toolbar">
+                <div class="options">
+                    <div class="option-group">
+                        <label>Format:</label>
+                        <select id="formatSelect">
+                            <option value="png">PNG</option>
+                            <option value="jpeg">JPEG</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label>Scale:</label>
+                        <select id="scaleSelect">
+                            <option value="1">1x (72 DPI)</option>
+                            <option value="2" selected>2x (144 DPI)</option>
+                            <option value="3">3x (216 DPI)</option>
+                            <option value="4">4x (288 DPI)</option>
+                        </select>
+                    </div>
+                    <div class="option-group" id="qualityGroup">
+                        <label>Quality:</label>
+                        <input type="number" id="qualityInput" value="90" min="1" max="100">
+                    </div>
+                </div>
+                <span class="spacer"></span>
+                <button id="downloadAllBtn" class="primary">Download All</button>
+            </div>
+
+            <div class="page-grid" id="pageGrid"></div>
+
+            <div class="toolbar">
+                <button id="resetBtn" class="secondary">Choose Different File</button>
+            </div>
+        </div>
+
+        <div class="status" id="status">
+            <span id="statusText"></span>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let currentFile = null;
+        let pdfDoc = null;
+        let renderedCanvases = [];
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const editorPanel = document.getElementById('editorPanel');
+        const pageGrid = document.getElementById('pageGrid');
+        const status = document.getElementById('status');
+        const formatSelect = document.getElementById('formatSelect');
+        const qualityGroup = document.getElementById('qualityGroup');
+
+        // Show/hide quality option based on format
+        formatSelect.addEventListener('change', () => {
+            qualityGroup.style.display = formatSelect.value === 'jpeg' ? 'flex' : 'none';
+        });
+
+        // Drop zone events
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showStatus('Please select a PDF file', true);
+                return;
+            }
+
+            showStatus('Loading PDF...');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentFile = { file, arrayBuffer };
+
+                pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                renderedCanvases = [];
+
+                await renderPageGrid();
+
+                dropZone.classList.add('hidden');
+                editorPanel.classList.remove('hidden');
+                status.classList.remove('show');
+            } catch (err) {
+                showStatus('Error loading PDF: ' + err.message, true);
+            }
+        }
+
+        async function renderPageGrid() {
+            pageGrid.innerHTML = '';
+            const scale = parseFloat(document.getElementById('scaleSelect').value);
+
+            showStatus('Rendering pages...');
+            showProgress(0);
+
+            for (let i = 0; i < pdfDoc.numPages; i++) {
+                const card = document.createElement('div');
+                card.className = 'page-card';
+
+                const preview = document.createElement('div');
+                preview.className = 'page-preview';
+
+                const canvas = document.createElement('canvas');
+                preview.appendChild(canvas);
+
+                const info = document.createElement('div');
+                info.className = 'page-info';
+                info.innerHTML = `
+                    <span class="page-number">Page ${i + 1}</span>
+                    <button class="download-btn" data-page="${i}">Download</button>
+                `;
+
+                card.appendChild(preview);
+                card.appendChild(info);
+                pageGrid.appendChild(card);
+
+                // Render at full scale but display smaller
+                const page = await pdfDoc.getPage(i + 1);
+                const viewport = page.getViewport({ scale });
+
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                renderedCanvases[i] = canvas;
+
+                showProgress((i + 1) / pdfDoc.numPages * 100);
+            }
+
+            // Add download handlers
+            pageGrid.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pageIndex = parseInt(btn.dataset.page);
+                    downloadPage(pageIndex);
+                });
+            });
+
+            hideProgress();
+            status.classList.remove('show');
+        }
+
+        function downloadPage(pageIndex) {
+            const canvas = renderedCanvases[pageIndex];
+            const format = formatSelect.value;
+            const quality = parseInt(document.getElementById('qualityInput').value) / 100;
+
+            const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const dataUrl = format === 'jpeg'
+                ? canvas.toDataURL(mimeType, quality)
+                : canvas.toDataURL(mimeType);
+
+            const baseName = currentFile.file.name.replace(/\.pdf$/i, '');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `${baseName}_page_${pageIndex + 1}.${format}`;
+            a.click();
+        }
+
+        document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+            const format = formatSelect.value;
+            const quality = parseInt(document.getElementById('qualityInput').value) / 100;
+            const baseName = currentFile.file.name.replace(/\.pdf$/i, '');
+
+            showStatus('Preparing downloads...');
+            showProgress(0);
+
+            for (let i = 0; i < renderedCanvases.length; i++) {
+                const canvas = renderedCanvases[i];
+                const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+                const dataUrl = format === 'jpeg'
+                    ? canvas.toDataURL(mimeType, quality)
+                    : canvas.toDataURL(mimeType);
+
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = `${baseName}_page_${i + 1}.${format}`;
+                a.click();
+
+                showProgress((i + 1) / renderedCanvases.length * 100);
+
+                // Small delay between downloads
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            hideProgress();
+            showStatus(`Downloaded ${renderedCanvases.length} images`);
+        });
+
+        // Re-render when scale changes
+        document.getElementById('scaleSelect').addEventListener('change', () => {
+            if (pdfDoc) {
+                renderPageGrid();
+            }
+        });
+
+        function showStatus(message, isError = false) {
+            document.getElementById('statusText').textContent = message;
+            status.className = 'status show' + (isError ? ' error' : '');
+        }
+
+        function showProgress(percent) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            progressFill.style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            document.getElementById('progressBar').style.display = 'none';
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            currentFile = null;
+            pdfDoc = null;
+            renderedCanvases = [];
+            fileInput.value = '';
+            dropZone.classList.remove('hidden');
+            editorPanel.classList.add('hidden');
+            status.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Text Extract - AI Showcase</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.05);
+        }
+        .drop-zone-text { color: #888; font-size: 1.1rem; }
+        .drop-zone-hint { color: #555; font-size: 0.85rem; margin-top: 8px; }
+        input[type="file"] { display: none; }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:hover { background: rgba(78, 205, 196, 0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.secondary {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            color: #888;
+        }
+        button.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .spacer { flex: 1; }
+        .file-info {
+            background: rgba(78, 205, 196, 0.1);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .file-info strong { color: #4ecdc4; }
+        .file-info .meta { color: #888; font-size: 0.85rem; }
+        .text-output {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+            max-height: 60vh;
+            overflow-y: auto;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .page-divider {
+            color: #4ecdc4;
+            border-bottom: 1px dashed rgba(78, 205, 196, 0.3);
+            padding-bottom: 8px;
+            margin: 16px 0;
+            font-weight: 600;
+        }
+        .page-divider:first-child { margin-top: 0; }
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 8px;
+            color: #4ecdc4;
+            display: none;
+        }
+        .status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+        .status.show { display: block; }
+        .hidden { display: none !important; }
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: rgba(255,255,255,0.03);
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-label { color: #666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { color: #4ecdc4; font-size: 1.2rem; font-weight: 600; }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4ecdc4;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>PDF Text Extract</h1>
+        <p class="subtitle">Extract all text content from PDF documents.</p>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
+            <div class="drop-zone-hint">Select a PDF to extract text from</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+
+        <div class="hidden" id="resultPanel">
+            <div class="file-info">
+                <span>📄</span>
+                <div>
+                    <strong id="fileName">document.pdf</strong>
+                    <div class="meta"><span id="pageCount">0</span> pages</div>
+                </div>
+            </div>
+
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Characters</div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Words</div>
+                    <div class="stat-value" id="wordCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Lines</div>
+                    <div class="stat-value" id="lineCount">0</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <button id="copyBtn">Copy All</button>
+                <button id="downloadBtn">Download as TXT</button>
+                <span class="spacer"></span>
+                <button id="resetBtn" class="secondary">Choose Different File</button>
+            </div>
+
+            <div class="text-output" id="textOutput"></div>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let currentFile = null;
+        let extractedText = '';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const resultPanel = document.getElementById('resultPanel');
+        const textOutput = document.getElementById('textOutput');
+        const status = document.getElementById('status');
+
+        // Drop zone events
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showStatus('Please select a PDF file', true);
+                return;
+            }
+
+            currentFile = file;
+            showStatus('Extracting text...');
+            showProgress(0);
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('pageCount').textContent = pdfDoc.numPages;
+
+                extractedText = '';
+                const pageTexts = [];
+
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    const page = await pdfDoc.getPage(i);
+                    const textContent = await page.getTextContent();
+
+                    let pageText = '';
+                    let lastY = null;
+
+                    for (const item of textContent.items) {
+                        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                            pageText += '\n';
+                        }
+                        pageText += item.str;
+                        lastY = item.transform[5];
+                    }
+
+                    pageTexts.push({ page: i, text: pageText.trim() });
+                    showProgress((i / pdfDoc.numPages) * 100);
+                }
+
+                // Combine all text
+                extractedText = pageTexts.map(p => p.text).join('\n\n');
+
+                // Display with page dividers
+                textOutput.innerHTML = '';
+                for (const { page, text } of pageTexts) {
+                    const divider = document.createElement('div');
+                    divider.className = 'page-divider';
+                    divider.textContent = `Page ${page}`;
+                    textOutput.appendChild(divider);
+
+                    const content = document.createElement('div');
+                    content.textContent = text || '(No text content on this page)';
+                    textOutput.appendChild(content);
+                }
+
+                // Update stats
+                const chars = extractedText.length;
+                const words = extractedText.split(/\s+/).filter(w => w.length > 0).length;
+                const lines = extractedText.split('\n').length;
+
+                document.getElementById('charCount').textContent = chars.toLocaleString();
+                document.getElementById('wordCount').textContent = words.toLocaleString();
+                document.getElementById('lineCount').textContent = lines.toLocaleString();
+
+                hideProgress();
+                dropZone.classList.add('hidden');
+                resultPanel.classList.remove('hidden');
+                status.classList.remove('show');
+            } catch (err) {
+                showStatus('Error extracting text: ' + err.message, true);
+                hideProgress();
+            }
+        }
+
+        function showStatus(message, isError = false) {
+            status.textContent = message;
+            status.className = 'status show' + (isError ? ' error' : '');
+        }
+
+        function showProgress(percent) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            progressFill.style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            document.getElementById('progressBar').style.display = 'none';
+        }
+
+        document.getElementById('copyBtn').addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(extractedText);
+                showStatus('Copied to clipboard!');
+                setTimeout(() => status.classList.remove('show'), 2000);
+            } catch (err) {
+                showStatus('Failed to copy: ' + err.message, true);
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const blob = new Blob([extractedText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentFile.name.replace(/\.pdf$/i, '.txt');
+            a.click();
+
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            currentFile = null;
+            extractedText = '';
+            fileInput.value = '';
+            textOutput.innerHTML = '';
+            dropZone.classList.remove('hidden');
+            resultPanel.classList.add('hidden');
+            status.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

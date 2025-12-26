@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Merge - AI Showcase</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.05);
+        }
+        .drop-zone-text { color: #888; font-size: 1.1rem; }
+        .drop-zone-hint { color: #555; font-size: 0.85rem; margin-top: 8px; }
+        input[type="file"] { display: none; }
+        .file-list {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 24px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: grab;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .file-item.dragging { opacity: 0.5; background: rgba(78, 205, 196, 0.1); }
+        .file-item.drag-over { border-top: 2px solid #4ecdc4; }
+        .file-icon { font-size: 1.5rem; margin-right: 12px; }
+        .file-info { flex: 1; }
+        .file-name { font-weight: 500; margin-bottom: 2px; }
+        .file-size { font-size: 0.8rem; color: #666; }
+        .file-pages { font-size: 0.8rem; color: #4ecdc4; margin-left: 8px; }
+        .file-remove {
+            background: none; border: none; color: #666; cursor: pointer;
+            font-size: 1.2rem; padding: 4px 8px;
+        }
+        .file-remove:hover { color: #ff6b6b; }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        button:hover { background: rgba(78, 205, 196, 0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.secondary {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            color: #888;
+        }
+        button.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 8px;
+            color: #4ecdc4;
+            display: none;
+        }
+        .status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+        .status.show { display: block; }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+        }
+        .drag-handle {
+            color: #444;
+            margin-right: 8px;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>PDF Merge</h1>
+        <p class="subtitle">Combine multiple PDF files into a single document. Drag to reorder.</p>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-text">Drop PDF files here or click to browse</div>
+            <div class="drop-zone-hint">Select multiple files to merge</div>
+            <input type="file" id="fileInput" accept=".pdf" multiple>
+        </div>
+
+        <div class="file-list" id="fileList" style="display: none;"></div>
+
+        <div class="actions">
+            <button id="mergeBtn" disabled>Merge PDFs</button>
+            <button id="clearBtn" class="secondary" style="display: none;">Clear All</button>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+
+        let files = [];
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const status = document.getElementById('status');
+
+        // Drop zone events
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', e => {
+            handleFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        async function handleFiles(newFiles) {
+            for (const file of newFiles) {
+                if (file.type === 'application/pdf') {
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await PDFDocument.load(arrayBuffer);
+                        const pageCount = pdf.getPageCount();
+
+                        files.push({
+                            file,
+                            name: file.name,
+                            size: file.size,
+                            pages: pageCount,
+                            arrayBuffer
+                        });
+                    } catch (err) {
+                        showStatus(`Error loading ${file.name}: ${err.message}`, true);
+                    }
+                }
+            }
+            renderFileList();
+        }
+
+        function renderFileList() {
+            if (files.length === 0) {
+                fileList.style.display = 'none';
+                clearBtn.style.display = 'none';
+                mergeBtn.disabled = true;
+                return;
+            }
+
+            fileList.style.display = 'block';
+            clearBtn.style.display = 'inline-block';
+            mergeBtn.disabled = files.length < 2;
+
+            fileList.innerHTML = files.map((f, i) => `
+                <div class="file-item" draggable="true" data-index="${i}">
+                    <span class="drag-handle">☰</span>
+                    <span class="file-icon">📄</span>
+                    <div class="file-info">
+                        <div class="file-name">${f.name}</div>
+                        <div>
+                            <span class="file-size">${formatSize(f.size)}</span>
+                            <span class="file-pages">${f.pages} page${f.pages !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                    <button class="file-remove" data-index="${i}">×</button>
+                </div>
+            `).join('');
+
+            // Add drag events for reordering
+            const items = fileList.querySelectorAll('.file-item');
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Remove buttons
+            fileList.querySelectorAll('.file-remove').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    files.splice(parseInt(btn.dataset.index), 1);
+                    renderFileList();
+                });
+            });
+        }
+
+        let draggedIndex = null;
+
+        function handleDragStart(e) {
+            draggedIndex = parseInt(e.currentTarget.dataset.index);
+            e.currentTarget.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const item = e.currentTarget;
+            item.classList.add('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropIndex = parseInt(e.currentTarget.dataset.index);
+
+            if (draggedIndex !== null && draggedIndex !== dropIndex) {
+                const draggedFile = files[draggedIndex];
+                files.splice(draggedIndex, 1);
+                files.splice(dropIndex, 0, draggedFile);
+                renderFileList();
+            }
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('dragging', 'drag-over');
+            });
+            draggedIndex = null;
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function showStatus(message, isError = false) {
+            status.textContent = message;
+            status.className = 'status show' + (isError ? ' error' : '');
+        }
+
+        clearBtn.addEventListener('click', () => {
+            files = [];
+            renderFileList();
+            status.className = 'status';
+        });
+
+        mergeBtn.addEventListener('click', async () => {
+            if (files.length < 2) return;
+
+            mergeBtn.disabled = true;
+            showStatus('Merging PDFs...');
+
+            try {
+                const mergedPdf = await PDFDocument.create();
+
+                for (const f of files) {
+                    const pdf = await PDFDocument.load(f.arrayBuffer);
+                    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    pages.forEach(page => mergedPdf.addPage(page));
+                }
+
+                const mergedBytes = await mergedPdf.save();
+                const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'merged.pdf';
+                a.click();
+
+                URL.revokeObjectURL(url);
+
+                const totalPages = files.reduce((sum, f) => sum + f.pages, 0);
+                showStatus(`Successfully merged ${files.length} files (${totalPages} pages total)`);
+            } catch (err) {
+                showStatus('Error merging PDFs: ' + err.message, true);
+            }
+
+            mergeBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>

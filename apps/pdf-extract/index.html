@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Extract Pages - AI Showcase</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.05);
+        }
+        .drop-zone-text { color: #888; font-size: 1.1rem; }
+        .drop-zone-hint { color: #555; font-size: 0.85rem; margin-top: 8px; }
+        input[type="file"] { display: none; }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        button {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:hover { background: rgba(78, 205, 196, 0.3); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.secondary {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.2);
+            color: #888;
+        }
+        button.secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        button.primary {
+            background: rgba(78, 205, 196, 0.3);
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+        .spacer { flex: 1; }
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .page-card:hover { border-color: rgba(255,255,255,0.2); }
+        .page-card.selected {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.3);
+        }
+        .page-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: #4ecdc4;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .page-preview {
+            aspect-ratio: 8.5/11;
+            background: #1a1a1f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .page-preview canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .page-info {
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .page-number { font-size: 0.85rem; color: #888; }
+        .status {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 8px;
+            color: #4ecdc4;
+            display: none;
+        }
+        .status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+        .status.show { display: block; }
+        .hidden { display: none !important; }
+        .select-hint {
+            color: #555;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>PDF Extract Pages</h1>
+        <p class="subtitle">Select pages to extract into a new PDF file.</p>
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
+            <div class="drop-zone-hint">Select a PDF to extract pages from</div>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+
+        <div class="hidden" id="editorPanel">
+            <div class="toolbar">
+                <button id="selectAllBtn" class="secondary">Select All</button>
+                <button id="deselectAllBtn" class="secondary">Deselect All</button>
+                <button id="invertBtn" class="secondary">Invert Selection</button>
+                <span class="select-hint" id="selectHint">Click pages to select</span>
+                <span class="spacer"></span>
+                <button id="extractBtn" class="primary">Extract Selected</button>
+            </div>
+
+            <div class="page-grid" id="pageGrid"></div>
+
+            <div class="toolbar">
+                <button id="resetBtn" class="secondary">Choose Different File</button>
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const { PDFDocument } = PDFLib;
+
+        let currentFile = null;
+        let pdfDoc = null;
+        let selectedPages = new Set();
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const editorPanel = document.getElementById('editorPanel');
+        const pageGrid = document.getElementById('pageGrid');
+        const status = document.getElementById('status');
+
+        // Drop zone events
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showStatus('Please select a PDF file', true);
+                return;
+            }
+
+            showStatus('Loading PDF...');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentFile = { file, arrayBuffer };
+
+                pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+                selectedPages.clear();
+
+                await renderPageGrid();
+
+                dropZone.classList.add('hidden');
+                editorPanel.classList.remove('hidden');
+                status.classList.remove('show');
+            } catch (err) {
+                showStatus('Error loading PDF: ' + err.message, true);
+            }
+        }
+
+        async function renderPageGrid() {
+            pageGrid.innerHTML = '';
+
+            for (let i = 0; i < pdfDoc.numPages; i++) {
+                const card = document.createElement('div');
+                card.className = 'page-card';
+                card.dataset.page = i;
+
+                const preview = document.createElement('div');
+                preview.className = 'page-preview';
+
+                const canvas = document.createElement('canvas');
+                preview.appendChild(canvas);
+
+                const info = document.createElement('div');
+                info.className = 'page-info';
+                info.innerHTML = `<span class="page-number">Page ${i + 1}</span>`;
+
+                card.appendChild(preview);
+                card.appendChild(info);
+                pageGrid.appendChild(card);
+
+                card.addEventListener('click', () => {
+                    const pageIndex = parseInt(card.dataset.page);
+                    if (selectedPages.has(pageIndex)) {
+                        selectedPages.delete(pageIndex);
+                        card.classList.remove('selected');
+                    } else {
+                        selectedPages.add(pageIndex);
+                        card.classList.add('selected');
+                    }
+                    updateSelectHint();
+                });
+
+                // Render preview
+                renderPagePreview(i, canvas);
+            }
+
+            updateSelectHint();
+        }
+
+        async function renderPagePreview(pageIndex, canvas) {
+            const page = await pdfDoc.getPage(pageIndex + 1);
+            const viewport = page.getViewport({ scale: 0.4 });
+
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+        }
+
+        function updateSelectHint() {
+            const hint = document.getElementById('selectHint');
+            if (selectedPages.size === 0) {
+                hint.textContent = 'Click pages to select';
+            } else {
+                hint.textContent = `${selectedPages.size} page${selectedPages.size !== 1 ? 's' : ''} selected`;
+            }
+        }
+
+        function showStatus(message, isError = false) {
+            status.textContent = message;
+            status.className = 'status show' + (isError ? ' error' : '');
+        }
+
+        document.getElementById('selectAllBtn').addEventListener('click', () => {
+            for (let i = 0; i < pdfDoc.numPages; i++) {
+                selectedPages.add(i);
+            }
+            document.querySelectorAll('.page-card').forEach(card => card.classList.add('selected'));
+            updateSelectHint();
+        });
+
+        document.getElementById('deselectAllBtn').addEventListener('click', () => {
+            selectedPages.clear();
+            document.querySelectorAll('.page-card').forEach(card => card.classList.remove('selected'));
+            updateSelectHint();
+        });
+
+        document.getElementById('invertBtn').addEventListener('click', () => {
+            for (let i = 0; i < pdfDoc.numPages; i++) {
+                if (selectedPages.has(i)) {
+                    selectedPages.delete(i);
+                } else {
+                    selectedPages.add(i);
+                }
+            }
+            document.querySelectorAll('.page-card').forEach(card => {
+                const pageIndex = parseInt(card.dataset.page);
+                card.classList.toggle('selected', selectedPages.has(pageIndex));
+            });
+            updateSelectHint();
+        });
+
+        document.getElementById('extractBtn').addEventListener('click', async () => {
+            if (selectedPages.size === 0) {
+                showStatus('Please select at least one page to extract', true);
+                return;
+            }
+
+            showStatus('Extracting pages...');
+
+            try {
+                const srcPdf = await PDFDocument.load(currentFile.arrayBuffer);
+                const newPdf = await PDFDocument.create();
+
+                const sortedPages = Array.from(selectedPages).sort((a, b) => a - b);
+                const copiedPages = await newPdf.copyPages(srcPdf, sortedPages);
+                copiedPages.forEach(page => newPdf.addPage(page));
+
+                const pdfBytes = await newPdf.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = currentFile.file.name.replace(/\.pdf$/i, '_extracted.pdf');
+                a.click();
+
+                URL.revokeObjectURL(url);
+                showStatus(`Successfully extracted ${selectedPages.size} page${selectedPages.size !== 1 ? 's' : ''}`);
+            } catch (err) {
+                showStatus('Error extracting pages: ' + err.message, true);
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            currentFile = null;
+            pdfDoc = null;
+            selectedPages.clear();
+            fileInput.value = '';
+            dropZone.classList.remove('hidden');
+            editorPanel.classList.add('hidden');
+            status.classList.remove('show');
+        });
+    </script>
+</body>
+</html>
