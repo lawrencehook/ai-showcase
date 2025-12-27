@@ -1402,5 +1402,18 @@
         "category": "Developer",
         "tags": ["hardware", "browser", "system"],
         "link": "https://en.wikipedia.org/wiki/WebGL"
+    },
+    {
+        "id": "primes",
+        "title": "Prime Visualizer",
+        "description": "Explore prime numbers through Ulam spirals, Sacks spirals, prime gaps, and animated sieving.",
+        "path": "apps/primes/index.html",
+        "emoji": "🔢",
+        "previewGradient": "linear-gradient(135deg, #4ecdc4 0%, #1a1a2e 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["primes", "visualization", "interactive"],
+        "link": "https://en.wikipedia.org/wiki/Prime_number"
     }
 ]

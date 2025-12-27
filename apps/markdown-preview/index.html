@@ -419,6 +419,35 @@ function greet(name) {
         });
 
         editor.addEventListener('input', updatePreview);
+
+        // Pre-fill with sample data
+        editor.value = `# Welcome to Markdown Preview
+
+This is a **live preview** of your *Markdown* text.
+
+## Features
+
+- Bold, italic, and ~~strikethrough~~
+- Links like [Example](https://example.com)
+- Inline \`code\` and code blocks
+
+### Code Example
+
+\`\`\`javascript
+function greet(name) {
+    return \`Hello, \${name}!\`;
+}
+\`\`\`
+
+### Blockquote
+
+> "The only way to do great work is to love what you do."
+
+| Feature | Status |
+|---------|--------|
+| Headers | Yes |
+| Lists   | Yes |
+| Code    | Yes |`;
         updatePreview();
     </script>
 </body>

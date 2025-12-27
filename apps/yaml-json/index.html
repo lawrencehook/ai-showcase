@@ -522,6 +522,28 @@ settings:
         input.addEventListener('input', convert);
         document.getElementById('jsonIndent').addEventListener('change', convert);
         document.getElementById('yamlIndent').addEventListener('change', convert);
+
+        // Pre-fill with sample data
+        input.value = `# Server configuration
+server:
+  host: localhost
+  port: 8080
+  ssl: true
+
+database:
+  type: postgresql
+  host: db.example.com
+  port: 5432
+
+features:
+  - authentication
+  - logging
+  - caching
+
+settings:
+  timeout: 30
+  debug: false`;
+        convert();
     </script>
 </body>
 </html>

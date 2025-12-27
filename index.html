@@ -565,6 +565,9 @@
         function renderApps(apps) {
             const gallery = document.getElementById('gallery');
 
+            // Sort alphabetically by title
+            apps = [...apps].sort((a, b) => a.title.localeCompare(b.title));
+
             if (apps.length === 0) {
                 gallery.innerHTML = `
                     <div class="empty-state">

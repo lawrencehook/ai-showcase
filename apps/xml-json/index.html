@@ -482,6 +482,24 @@
         input.addEventListener('input', convert);
         document.getElementById('preserveAttrs').addEventListener('change', convert);
         document.getElementById('indent').addEventListener('change', convert);
+
+        // Pre-fill with sample data
+        input.value = `<?xml version="1.0" encoding="UTF-8"?>
+<library>
+    <book id="1" category="fiction">
+        <title>The Great Gatsby</title>
+        <author>F. Scott Fitzgerald</author>
+        <year>1925</year>
+        <price>10.99</price>
+    </book>
+    <book id="2" category="non-fiction">
+        <title>Sapiens</title>
+        <author>Yuval Noah Harari</author>
+        <year>2011</year>
+        <price>14.99</price>
+    </book>
+</library>`;
+        convert();
     </script>
 </body>
 </html>

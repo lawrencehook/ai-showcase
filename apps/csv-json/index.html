@@ -453,6 +453,14 @@ Alice Brown,36,Houston,true`;
         document.getElementById('headerRow').addEventListener('change', convert);
         document.getElementById('delimiter').addEventListener('change', convert);
         document.getElementById('indent').addEventListener('change', convert);
+
+        // Pre-fill with sample data
+        input.value = `name,age,city,active
+John Doe,32,New York,true
+Jane Smith,28,Los Angeles,true
+Bob Johnson,45,Chicago,false
+Alice Brown,36,Houston,true`;
+        convert();
     </script>
 </body>
 </html>
