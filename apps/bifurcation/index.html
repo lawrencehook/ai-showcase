@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bifurcation Diagram - Apps by AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            height: 100vh;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .title-section {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        h1 { font-size: 1.3rem; color: #fff; }
+        .subtitle { color: #666; font-size: 0.8rem; }
+        .back-link {
+            color: #666; text-decoration: none; font-size: 13px;
+            padding: 6px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        label { color: #888; font-size: 0.75rem; }
+        input[type="range"] { width: 100px; accent-color: #4ecdc4; }
+        .value { color: #4ecdc4; font-family: monospace; font-size: 0.8rem; min-width: 50px; }
+        select, button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; padding: 5px 12px; border-radius: 4px; font-size: 0.8rem;
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255,255,255,0.1); }
+        .btn-primary {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
+            position: relative;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+        .info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #888;
+        }
+        .info span { color: #4ecdc4; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-section">
+                <h1>Bifurcation Diagram</h1>
+                <span class="subtitle">Logistic map: x → rx(1-x) — route to chaos</span>
+            </div>
+            <a href="../../index.html" class="back-link">← Back</a>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>r min</label>
+                <input type="range" id="rMin" min="0" max="3.5" step="0.01" value="2.5">
+                <span class="value" id="rMinVal">2.50</span>
+            </div>
+            <div class="control-group">
+                <label>r max</label>
+                <input type="range" id="rMax" min="2.5" max="4" step="0.01" value="4">
+                <span class="value" id="rMaxVal">4.00</span>
+            </div>
+            <div class="control-group">
+                <label>Iterations</label>
+                <input type="range" id="iterations" min="100" max="1000" step="50" value="500">
+                <span class="value" id="iterVal">500</span>
+            </div>
+            <div class="control-group">
+                <label>Color</label>
+                <select id="colorScheme">
+                    <option value="density">Density</option>
+                    <option value="cyan">Cyan</option>
+                    <option value="fire">Fire</option>
+                    <option value="rainbow">Rainbow</option>
+                </select>
+            </div>
+            <button class="btn-primary" id="reset">Reset View</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div class="info">
+                r = <span id="rValue">-</span> | x = <span id="xValue">-</span> | Drag to zoom
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const rMinSlider = document.getElementById('rMin');
+        const rMaxSlider = document.getElementById('rMax');
+        const iterSlider = document.getElementById('iterations');
+        const colorSelect = document.getElementById('colorScheme');
+
+        let width, height;
+        let density = [];
+        let isDragging = false;
+        let dragStart = null;
+
+        function resize() {
+            const container = document.querySelector('.canvas-container');
+            width = container.clientWidth - 20;
+            height = container.clientHeight - 40;
+            canvas.width = width;
+            canvas.height = height;
+            render();
+        }
+
+        function render() {
+            const rMin = parseFloat(rMinSlider.value);
+            const rMax = parseFloat(rMaxSlider.value);
+            const iterations = parseInt(iterSlider.value);
+            const skip = 200; // Skip initial transient
+
+            document.getElementById('rMinVal').textContent = rMin.toFixed(2);
+            document.getElementById('rMaxVal').textContent = rMax.toFixed(2);
+            document.getElementById('iterVal').textContent = iterations;
+
+            // Initialize density array
+            density = new Array(width).fill(null).map(() => new Array(height).fill(0));
+
+            // Calculate bifurcation
+            for (let px = 0; px < width; px++) {
+                const r = rMin + (px / width) * (rMax - rMin);
+                let x = 0.5; // Initial condition
+
+                // Skip transient
+                for (let i = 0; i < skip; i++) {
+                    x = r * x * (1 - x);
+                }
+
+                // Record iterations
+                for (let i = 0; i < iterations; i++) {
+                    x = r * x * (1 - x);
+                    const py = Math.floor((1 - x) * height);
+                    if (py >= 0 && py < height) {
+                        density[px][py]++;
+                    }
+                }
+            }
+
+            draw();
+        }
+
+        function draw() {
+            const scheme = colorSelect.value;
+
+            // Find max density
+            let maxDensity = 0;
+            for (let px = 0; px < width; px++) {
+                for (let py = 0; py < height; py++) {
+                    maxDensity = Math.max(maxDensity, density[px][py]);
+                }
+            }
+
+            const imageData = ctx.createImageData(width, height);
+            const data = imageData.data;
+
+            for (let py = 0; py < height; py++) {
+                for (let px = 0; px < width; px++) {
+                    const idx = (py * width + px) * 4;
+                    const d = density[px][py];
+
+                    if (d === 0) {
+                        data[idx] = 10;
+                        data[idx + 1] = 10;
+                        data[idx + 2] = 15;
+                    } else {
+                        const t = Math.pow(d / maxDensity, 0.3); // Gamma correction
+                        let r, g, b;
+
+                        switch (scheme) {
+                            case 'density':
+                                r = Math.floor(t * 255);
+                                g = Math.floor(t * 200);
+                                b = Math.floor(t * 180);
+                                break;
+                            case 'cyan':
+                                r = Math.floor(t * 78);
+                                g = Math.floor(t * 205);
+                                b = Math.floor(t * 196);
+                                break;
+                            case 'fire':
+                                r = Math.floor(Math.min(255, t * 3 * 255));
+                                g = Math.floor(Math.max(0, (t - 0.33) * 3 * 255));
+                                b = Math.floor(Math.max(0, (t - 0.66) * 3 * 255));
+                                break;
+                            case 'rainbow':
+                                const h = t * 270;
+                                const c = 1, x = 1 - Math.abs((h / 60) % 2 - 1);
+                                if (h < 60) [r, g, b] = [c, x, 0];
+                                else if (h < 120) [r, g, b] = [x, c, 0];
+                                else if (h < 180) [r, g, b] = [0, c, x];
+                                else if (h < 240) [r, g, b] = [0, x, c];
+                                else [r, g, b] = [x, 0, c];
+                                r = Math.floor(r * 255);
+                                g = Math.floor(g * 255);
+                                b = Math.floor(b * 255);
+                                break;
+                        }
+
+                        data[idx] = r;
+                        data[idx + 1] = g;
+                        data[idx + 2] = b;
+                    }
+                    data[idx + 3] = 255;
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Mouse tracking
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+
+            const rMin = parseFloat(rMinSlider.value);
+            const rMax = parseFloat(rMaxSlider.value);
+            const r = rMin + (px / width) * (rMax - rMin);
+            const x = 1 - (py / height);
+
+            document.getElementById('rValue').textContent = r.toFixed(4);
+            document.getElementById('xValue').textContent = x.toFixed(4);
+
+            if (isDragging && dragStart) {
+                // Draw selection rectangle
+                draw();
+                ctx.strokeStyle = 'rgba(78, 205, 196, 0.8)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(
+                    dragStart.x, dragStart.y,
+                    px - dragStart.x, py - dragStart.y
+                );
+            }
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            dragStart = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+            isDragging = true;
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (isDragging && dragStart) {
+                const rect = canvas.getBoundingClientRect();
+                const endX = e.clientX - rect.left;
+                const endY = e.clientY - rect.top;
+
+                const rMin = parseFloat(rMinSlider.value);
+                const rMax = parseFloat(rMaxSlider.value);
+
+                const newRMin = rMin + (Math.min(dragStart.x, endX) / width) * (rMax - rMin);
+                const newRMax = rMin + (Math.max(dragStart.x, endX) / width) * (rMax - rMin);
+
+                if (Math.abs(endX - dragStart.x) > 10) {
+                    rMinSlider.value = Math.max(0, newRMin);
+                    rMaxSlider.value = Math.min(4, newRMax);
+                    render();
+                }
+            }
+            isDragging = false;
+            dragStart = null;
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            rMinSlider.value = 2.5;
+            rMaxSlider.value = 4;
+            render();
+        });
+
+        rMinSlider.addEventListener('input', render);
+        rMaxSlider.addEventListener('input', render);
+        iterSlider.addEventListener('input', render);
+        colorSelect.addEventListener('change', draw);
+
+        window.addEventListener('resize', resize);
+        resize();
+    </script>
+</body>
+</html>

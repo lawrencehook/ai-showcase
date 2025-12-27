@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collatz Conjecture - Apps by AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            height: 100vh;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .title-section {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        h1 { font-size: 1.3rem; color: #fff; }
+        .subtitle { color: #666; font-size: 0.8rem; }
+        .back-link {
+            color: #666; text-decoration: none; font-size: 13px;
+            padding: 6px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        label { color: #888; font-size: 0.75rem; }
+        input[type="number"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; padding: 5px 10px; border-radius: 4px;
+            font-size: 0.85rem; width: 80px;
+        }
+        input[type="range"] { width: 100px; accent-color: #4ecdc4; }
+        .value { color: #4ecdc4; font-family: monospace; font-size: 0.8rem; min-width: 40px; }
+        select, button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; padding: 5px 12px; border-radius: 4px; font-size: 0.8rem;
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255,255,255,0.1); }
+        .btn-primary {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
+            position: relative;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        .stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        .stats div { margin-bottom: 4px; }
+        .stats span { color: #4ecdc4; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-section">
+                <h1>Collatz Conjecture</h1>
+                <span class="subtitle">The 3n+1 problem - all paths lead to 1</span>
+            </div>
+            <a href="../../index.html" class="back-link">← Back</a>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Mode</label>
+                <select id="mode">
+                    <option value="tree">Tree (1-N)</option>
+                    <option value="single">Single Path</option>
+                    <option value="comparison">Compare Paths</option>
+                </select>
+            </div>
+            <div class="control-group" id="rangeGroup">
+                <label>Range</label>
+                <input type="range" id="range" min="10" max="1000" value="100">
+                <span class="value" id="rangeVal">100</span>
+            </div>
+            <div class="control-group" id="numberGroup" style="display: none;">
+                <label>Start</label>
+                <input type="number" id="startNum" value="27" min="1">
+            </div>
+            <div class="control-group">
+                <label>Angle</label>
+                <input type="range" id="angle" min="2" max="20" value="8">
+                <span class="value" id="angleVal">8°</span>
+            </div>
+            <button class="btn-primary" id="generate">Generate</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div class="stats" id="stats">
+                <div>Numbers: <span id="numCount">-</span></div>
+                <div>Max steps: <span id="maxSteps">-</span></div>
+                <div>Max value: <span id="maxValue">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const modeSelect = document.getElementById('mode');
+        const rangeSlider = document.getElementById('range');
+        const startNumInput = document.getElementById('startNum');
+        const angleSlider = document.getElementById('angle');
+
+        let width, height;
+
+        function resize() {
+            const container = document.querySelector('.canvas-container');
+            width = container.clientWidth - 20;
+            height = container.clientHeight - 20;
+            canvas.width = width;
+            canvas.height = height;
+            generate();
+        }
+
+        function collatzSequence(n) {
+            const seq = [n];
+            while (n !== 1) {
+                if (n % 2 === 0) {
+                    n = n / 2;
+                } else {
+                    n = 3 * n + 1;
+                }
+                seq.push(n);
+            }
+            return seq;
+        }
+
+        function drawTree() {
+            const maxN = parseInt(rangeSlider.value);
+            const baseAngle = parseInt(angleSlider.value) * Math.PI / 180;
+
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            // Collect all sequences
+            const sequences = [];
+            let maxSteps = 0;
+            let maxValue = 0;
+
+            for (let n = 2; n <= maxN; n++) {
+                const seq = collatzSequence(n);
+                sequences.push(seq.reverse()); // Reverse so we draw from 1 outward
+                maxSteps = Math.max(maxSteps, seq.length);
+                maxValue = Math.max(maxValue, Math.max(...seq));
+            }
+
+            document.getElementById('numCount').textContent = maxN;
+            document.getElementById('maxSteps').textContent = maxSteps;
+            document.getElementById('maxValue').textContent = maxValue.toLocaleString();
+
+            const segmentLen = Math.min(12, height / maxSteps * 0.8);
+
+            sequences.forEach((seq, seqIdx) => {
+                let x = width / 2;
+                let y = height - 20;
+                let angle = -Math.PI / 2;
+
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+
+                for (let i = 1; i < seq.length; i++) {
+                    const prev = seq[i - 1];
+                    const curr = seq[i];
+
+                    // Turn based on even/odd
+                    if (prev % 2 === 0) {
+                        angle += baseAngle;
+                    } else {
+                        angle -= baseAngle;
+                    }
+
+                    x += Math.cos(angle) * segmentLen;
+                    y += Math.sin(angle) * segmentLen;
+                    ctx.lineTo(x, y);
+                }
+
+                const hue = (seqIdx / sequences.length) * 280;
+                ctx.strokeStyle = `hsla(${hue}, 70%, 55%, 0.6)`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+            });
+        }
+
+        function drawSinglePath() {
+            const n = parseInt(startNumInput.value) || 27;
+            const seq = collatzSequence(n);
+
+            document.getElementById('numCount').textContent = '1';
+            document.getElementById('maxSteps').textContent = seq.length;
+            document.getElementById('maxValue').textContent = Math.max(...seq).toLocaleString();
+
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw as a graph
+            const padding = 50;
+            const graphWidth = width - padding * 2;
+            const graphHeight = height - padding * 2;
+
+            const maxVal = Math.max(...seq);
+            const stepW = graphWidth / (seq.length - 1);
+
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw path
+            ctx.beginPath();
+            seq.forEach((val, i) => {
+                const x = padding + i * stepW;
+                const y = height - padding - (val / maxVal) * graphHeight;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw points
+            seq.forEach((val, i) => {
+                const x = padding + i * stepW;
+                const y = height - padding - (val / maxVal) * graphHeight;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = val % 2 === 0 ? '#4ecdc4' : '#ff6b6b';
+                ctx.fill();
+            });
+
+            // Labels
+            ctx.fillStyle = '#888';
+            ctx.font = '11px system-ui';
+            ctx.fillText(`Start: ${n}`, padding, padding - 10);
+            ctx.fillText(`Steps: ${seq.length}`, padding + 100, padding - 10);
+            ctx.fillText(`Max: ${maxVal}`, padding + 200, padding - 10);
+        }
+
+        function drawComparison() {
+            const baseN = parseInt(startNumInput.value) || 27;
+            const numbers = [baseN, baseN + 1, baseN + 2, baseN * 2, baseN * 3];
+
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            const sequences = numbers.map(n => ({ n, seq: collatzSequence(n) }));
+            const maxLen = Math.max(...sequences.map(s => s.seq.length));
+            const maxVal = Math.max(...sequences.flatMap(s => s.seq));
+
+            document.getElementById('numCount').textContent = numbers.length;
+            document.getElementById('maxSteps').textContent = maxLen;
+            document.getElementById('maxValue').textContent = maxVal.toLocaleString();
+
+            const padding = 50;
+            const graphWidth = width - padding * 2;
+            const graphHeight = height - padding * 2;
+
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            const colors = ['#4ecdc4', '#ff6b6b', '#ffe66d', '#a855f7', '#f97316'];
+
+            sequences.forEach((data, idx) => {
+                const seq = data.seq;
+                const stepW = graphWidth / (maxLen - 1);
+
+                ctx.beginPath();
+                seq.forEach((val, i) => {
+                    const x = padding + i * stepW;
+                    const y = height - padding - (val / maxVal) * graphHeight;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = colors[idx];
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // Legend
+            sequences.forEach((data, idx) => {
+                ctx.fillStyle = colors[idx];
+                ctx.fillRect(width - 120, padding + idx * 20, 12, 12);
+                ctx.fillStyle = '#888';
+                ctx.font = '11px system-ui';
+                ctx.fillText(`n=${data.n} (${data.seq.length})`, width - 100, padding + idx * 20 + 10);
+            });
+        }
+
+        function generate() {
+            const mode = modeSelect.value;
+            document.getElementById('rangeGroup').style.display = mode === 'tree' ? 'flex' : 'none';
+            document.getElementById('numberGroup').style.display = mode !== 'tree' ? 'flex' : 'none';
+
+            document.getElementById('rangeVal').textContent = rangeSlider.value;
+            document.getElementById('angleVal').textContent = angleSlider.value + '°';
+
+            switch (mode) {
+                case 'tree': drawTree(); break;
+                case 'single': drawSinglePath(); break;
+                case 'comparison': drawComparison(); break;
+            }
+        }
+
+        modeSelect.addEventListener('change', generate);
+        rangeSlider.addEventListener('input', generate);
+        angleSlider.addEventListener('input', generate);
+        startNumInput.addEventListener('change', generate);
+        document.getElementById('generate').addEventListener('click', generate);
+
+        window.addEventListener('resize', resize);
+        resize();
+    </script>
+</body>
+</html>

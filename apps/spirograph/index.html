@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirograph - Apps by AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            height: 100vh;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .title-section {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        h1 { font-size: 1.3rem; color: #fff; }
+        .subtitle { color: #666; font-size: 0.8rem; }
+        .back-link {
+            color: #666; text-decoration: none; font-size: 13px;
+            padding: 6px 12px; background: rgba(255,255,255,0.05);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        label { color: #888; font-size: 0.75rem; }
+        input[type="range"] { width: 80px; accent-color: #4ecdc4; }
+        .value { color: #4ecdc4; font-family: monospace; font-size: 0.8rem; min-width: 35px; }
+        button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; padding: 5px 12px; border-radius: 4px; font-size: 0.8rem;
+            cursor: pointer;
+        }
+        button:hover { background: rgba(255,255,255,0.1); }
+        .btn-primary {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+        input[type="checkbox"] { accent-color: #4ecdc4; }
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        .presets {
+            display: flex;
+            gap: 6px;
+        }
+        .preset {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #888; padding: 4px 8px; border-radius: 4px;
+            cursor: pointer; font-size: 0.7rem;
+        }
+        .preset:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-section">
+                <h1>Spirograph</h1>
+                <span class="subtitle">Hypotrochoid and epitrochoid curves</span>
+            </div>
+            <a href="../../index.html" class="back-link">← Back</a>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>R (outer)</label>
+                <input type="range" id="R" min="50" max="200" value="150">
+                <span class="value" id="Rval">150</span>
+            </div>
+            <div class="control-group">
+                <label>r (inner)</label>
+                <input type="range" id="r" min="10" max="150" value="45">
+                <span class="value" id="rval">45</span>
+            </div>
+            <div class="control-group">
+                <label>d (pen)</label>
+                <input type="range" id="d" min="10" max="150" value="80">
+                <span class="value" id="dval">80</span>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="epitrochoid"> Epitrochoid
+                </label>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="animate" checked> Animate
+                </label>
+            </div>
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="rainbow" checked> Rainbow
+                </label>
+            </div>
+            <button class="btn-primary" id="clear">Clear</button>
+            <div class="presets">
+                <button class="preset" data-p="150,45,80,0">Flower</button>
+                <button class="preset" data-p="150,75,75,0">Star</button>
+                <button class="preset" data-p="150,90,90,0">Triangle</button>
+                <button class="preset" data-p="100,70,70,1">Loops</button>
+                <button class="preset" data-p="150,37,100,0">Petals</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const RSlider = document.getElementById('R');
+        const rSlider = document.getElementById('r');
+        const dSlider = document.getElementById('d');
+        const epitrochoidCheck = document.getElementById('epitrochoid');
+        const animateCheck = document.getElementById('animate');
+        const rainbowCheck = document.getElementById('rainbow');
+
+        let width, height, cx, cy;
+        let t = 0;
+        let animId;
+        let points = [];
+
+        function resize() {
+            const container = document.querySelector('.canvas-container');
+            const size = Math.min(container.clientWidth, container.clientHeight) - 20;
+            width = height = Math.floor(size);
+            canvas.width = width;
+            canvas.height = height;
+            cx = width / 2;
+            cy = height / 2;
+            clear();
+        }
+
+        function gcd(a, b) {
+            a = Math.abs(Math.round(a));
+            b = Math.abs(Math.round(b));
+            while (b) {
+                const temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+
+        function getPoint(t) {
+            const R = parseFloat(RSlider.value);
+            const r = parseFloat(rSlider.value);
+            const d = parseFloat(dSlider.value);
+            const isEpi = epitrochoidCheck.checked;
+
+            let x, y;
+            if (isEpi) {
+                // Epitrochoid: circle rolls outside
+                x = (R + r) * Math.cos(t) - d * Math.cos(((R + r) / r) * t);
+                y = (R + r) * Math.sin(t) - d * Math.sin(((R + r) / r) * t);
+            } else {
+                // Hypotrochoid: circle rolls inside
+                x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+            }
+            return { x: cx + x, y: cy + y };
+        }
+
+        function getMaxT() {
+            const R = parseFloat(RSlider.value);
+            const r = parseFloat(rSlider.value);
+            const g = gcd(R, r);
+            return 2 * Math.PI * (r / g);
+        }
+
+        function updateValues() {
+            document.getElementById('Rval').textContent = RSlider.value;
+            document.getElementById('rval').textContent = rSlider.value;
+            document.getElementById('dval').textContent = dSlider.value;
+        }
+
+        function clear() {
+            t = 0;
+            points = [];
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+            if (animateCheck.checked) {
+                startAnimation();
+            } else {
+                drawComplete();
+            }
+        }
+
+        function drawComplete() {
+            cancelAnimationFrame(animId);
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            const maxT = getMaxT();
+            const steps = Math.max(5000, maxT * 500);
+            const dt = maxT / steps;
+
+            ctx.beginPath();
+            const start = getPoint(0);
+            ctx.moveTo(start.x, start.y);
+
+            for (let i = 1; i <= steps; i++) {
+                const pt = getPoint(i * dt);
+                if (rainbowCheck.checked) {
+                    ctx.strokeStyle = `hsl(${(i / steps) * 360}, 80%, 60%)`;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(pt.x, pt.y);
+                } else {
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            }
+
+            if (!rainbowCheck.checked) {
+                ctx.strokeStyle = '#4ecdc4';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+
+        function startAnimation() {
+            cancelAnimationFrame(animId);
+            t = 0;
+            points = [];
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+            animate();
+        }
+
+        function animate() {
+            const maxT = getMaxT();
+            const speed = 0.05;
+
+            if (t < maxT) {
+                const pt = getPoint(t);
+                points.push({ ...pt, t });
+
+                if (points.length > 1) {
+                    const prev = points[points.length - 2];
+                    ctx.beginPath();
+                    ctx.moveTo(prev.x, prev.y);
+                    ctx.lineTo(pt.x, pt.y);
+
+                    if (rainbowCheck.checked) {
+                        ctx.strokeStyle = `hsl(${(t / maxT) * 360}, 80%, 60%)`;
+                    } else {
+                        ctx.strokeStyle = '#4ecdc4';
+                    }
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                t += speed;
+                animId = requestAnimationFrame(animate);
+            }
+        }
+
+        RSlider.addEventListener('input', () => { updateValues(); clear(); });
+        rSlider.addEventListener('input', () => { updateValues(); clear(); });
+        dSlider.addEventListener('input', () => { updateValues(); clear(); });
+        epitrochoidCheck.addEventListener('change', clear);
+        animateCheck.addEventListener('change', clear);
+        rainbowCheck.addEventListener('change', clear);
+        document.getElementById('clear').addEventListener('click', clear);
+
+        document.querySelectorAll('.preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const [R, r, d, epi] = btn.dataset.p.split(',').map(Number);
+                RSlider.value = R;
+                rSlider.value = r;
+                dSlider.value = d;
+                epitrochoidCheck.checked = epi === 1;
+                updateValues();
+                clear();
+            });
+        });
+
+        window.addEventListener('resize', resize);
+        updateValues();
+        resize();
+    </script>
+</body>
+</html>

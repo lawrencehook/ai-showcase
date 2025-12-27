@@ -1415,5 +1415,83 @@
         "category": "Mathematics",
         "tags": ["primes", "visualization", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Prime_number"
+    },
+    {
+        "id": "julia-sets",
+        "title": "Julia Sets",
+        "description": "Explore infinite fractal complexity. Each point in the Mandelbrot set defines a unique Julia set.",
+        "path": "apps/julia-sets/index.html",
+        "emoji": "🌀",
+        "previewGradient": "linear-gradient(135deg, #0c0c0c 0%, #4a00e0 50%, #ff006e 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["fractal", "complex", "interactive"],
+        "link": "https://en.wikipedia.org/wiki/Julia_set"
+    },
+    {
+        "id": "apollonian-gasket",
+        "title": "Apollonian Gasket",
+        "description": "Recursive circle packing fractal using Descartes' Circle Theorem.",
+        "path": "apps/apollonian-gasket/index.html",
+        "emoji": "⭕",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #f093fb 50%, #ff6b6b 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["fractal", "geometry", "circles"],
+        "link": "https://en.wikipedia.org/wiki/Apollonian_gasket"
+    },
+    {
+        "id": "spirograph",
+        "title": "Spirograph",
+        "description": "Draw beautiful hypotrochoid and epitrochoid curves with customizable parameters.",
+        "path": "apps/spirograph/index.html",
+        "emoji": "🎡",
+        "previewGradient": "linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #ffe66d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["curves", "geometry", "art"],
+        "link": "https://en.wikipedia.org/wiki/Spirograph"
+    },
+    {
+        "id": "collatz",
+        "title": "Collatz Conjecture",
+        "description": "Visualize the 3n+1 problem. Every sequence seems to reach 1, but no one can prove it.",
+        "path": "apps/collatz/index.html",
+        "emoji": "🌳",
+        "previewGradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["conjecture", "sequences", "unsolved"],
+        "link": "https://en.wikipedia.org/wiki/Collatz_conjecture"
+    },
+    {
+        "id": "bifurcation",
+        "title": "Bifurcation Diagram",
+        "description": "The logistic map's route to chaos. Watch order dissolve into randomness, then find order again.",
+        "path": "apps/bifurcation/index.html",
+        "emoji": "🦋",
+        "previewGradient": "linear-gradient(135deg, #1a1a2e 0%, #4ecdc4 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["chaos", "dynamics", "interactive"],
+        "link": "https://en.wikipedia.org/wiki/Bifurcation_diagram"
+    },
+    {
+        "id": "hyperbolic-tiling",
+        "title": "Hyperbolic Tiling",
+        "description": "Escher-like tessellations in the Poincaré disk. Infinite patterns in finite space.",
+        "path": "apps/hyperbolic-tiling/index.html",
+        "emoji": "🔮",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Mathematics",
+        "tags": ["geometry", "tessellation", "hyperbolic"],
+        "link": "https://en.wikipedia.org/wiki/Uniform_tilings_in_hyperbolic_plane"
     }
 ]
