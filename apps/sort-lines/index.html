@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sort Lines - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .sort-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .sort-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 12px 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .sort-btn:hover {
+            background: rgba(78, 205, 196, 0.1);
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+        .sort-btn.active {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.5);
+        }
+        .sort-btn .name { color: #fff; font-weight: 500; font-size: 0.9rem; }
+        .sort-btn .desc { color: #666; font-size: 0.75rem; margin-top: 2px; }
+        .sort-btn.active .name { color: #4ecdc4; }
+        .options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option input { accent-color: #4ecdc4; }
+        .option label { color: #888; font-size: 0.85rem; }
+        .editors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 768px) {
+            .editors { grid-template-columns: 1fr; }
+        }
+        .editor-panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .editor-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-title { color: #888; font-size: 0.9rem; }
+        .line-count { color: #4ecdc4; font-size: 0.85rem; font-family: monospace; }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Sort Lines</h1>
+        <p class="subtitle">Sort lines of text alphabetically, numerically, or randomly.</p>
+
+        <div class="sort-options">
+            <button class="sort-btn active" data-sort="alpha-asc">
+                <div class="name">A → Z</div>
+                <div class="desc">Alphabetical</div>
+            </button>
+            <button class="sort-btn" data-sort="alpha-desc">
+                <div class="name">Z → A</div>
+                <div class="desc">Reverse alphabetical</div>
+            </button>
+            <button class="sort-btn" data-sort="num-asc">
+                <div class="name">1 → 9</div>
+                <div class="desc">Numerical ascending</div>
+            </button>
+            <button class="sort-btn" data-sort="num-desc">
+                <div class="name">9 → 1</div>
+                <div class="desc">Numerical descending</div>
+            </button>
+            <button class="sort-btn" data-sort="length-asc">
+                <div class="name">Short → Long</div>
+                <div class="desc">By line length</div>
+            </button>
+            <button class="sort-btn" data-sort="length-desc">
+                <div class="name">Long → Short</div>
+                <div class="desc">By line length</div>
+            </button>
+            <button class="sort-btn" data-sort="random">
+                <div class="name">Shuffle</div>
+                <div class="desc">Random order</div>
+            </button>
+            <button class="sort-btn" data-sort="reverse">
+                <div class="name">Reverse</div>
+                <div class="desc">Flip line order</div>
+            </button>
+        </div>
+
+        <div class="options-row">
+            <div class="option">
+                <input type="checkbox" id="caseSensitive">
+                <label for="caseSensitive">Case sensitive</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="removeEmpty" checked>
+                <label for="removeEmpty">Remove empty lines</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="removeDuplicates">
+                <label for="removeDuplicates">Remove duplicates</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="trimLines" checked>
+                <label for="trimLines">Trim whitespace</label>
+            </div>
+        </div>
+
+        <div class="editors">
+            <div class="editor-panel">
+                <div class="editor-header">
+                    <span class="editor-title">Input</span>
+                    <span class="line-count" id="inputCount">0 lines</span>
+                </div>
+                <textarea id="inputText" placeholder="Enter lines of text to sort..."></textarea>
+            </div>
+            <div class="editor-panel">
+                <div class="editor-header">
+                    <span class="editor-title">Sorted Output</span>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                </div>
+                <textarea id="outputText" readonly placeholder="Sorted lines will appear here..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        let currentSort = 'alpha-asc';
+
+        function sort() {
+            const caseSensitive = document.getElementById('caseSensitive').checked;
+            const removeEmpty = document.getElementById('removeEmpty').checked;
+            const removeDuplicates = document.getElementById('removeDuplicates').checked;
+            const trimLines = document.getElementById('trimLines').checked;
+
+            let lines = inputText.value.split('\n');
+
+            if (trimLines) {
+                lines = lines.map(line => line.trim());
+            }
+
+            if (removeEmpty) {
+                lines = lines.filter(line => line.length > 0);
+            }
+
+            if (removeDuplicates) {
+                const seen = new Set();
+                lines = lines.filter(line => {
+                    const key = caseSensitive ? line : line.toLowerCase();
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+            }
+
+            const compare = (a, b) => {
+                if (!caseSensitive) {
+                    a = a.toLowerCase();
+                    b = b.toLowerCase();
+                }
+                return a.localeCompare(b, undefined, { numeric: true });
+            };
+
+            switch (currentSort) {
+                case 'alpha-asc':
+                    lines.sort(compare);
+                    break;
+                case 'alpha-desc':
+                    lines.sort((a, b) => -compare(a, b));
+                    break;
+                case 'num-asc':
+                    lines.sort((a, b) => {
+                        const numA = parseFloat(a.match(/-?\d+\.?\d*/)?.[0] || 0);
+                        const numB = parseFloat(b.match(/-?\d+\.?\d*/)?.[0] || 0);
+                        return numA - numB;
+                    });
+                    break;
+                case 'num-desc':
+                    lines.sort((a, b) => {
+                        const numA = parseFloat(a.match(/-?\d+\.?\d*/)?.[0] || 0);
+                        const numB = parseFloat(b.match(/-?\d+\.?\d*/)?.[0] || 0);
+                        return numB - numA;
+                    });
+                    break;
+                case 'length-asc':
+                    lines.sort((a, b) => a.length - b.length);
+                    break;
+                case 'length-desc':
+                    lines.sort((a, b) => b.length - a.length);
+                    break;
+                case 'random':
+                    for (let i = lines.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [lines[i], lines[j]] = [lines[j], lines[i]];
+                    }
+                    break;
+                case 'reverse':
+                    lines.reverse();
+                    break;
+            }
+
+            outputText.value = lines.join('\n');
+            document.getElementById('inputCount').textContent = inputText.value.split('\n').length + ' lines';
+        }
+
+        inputText.addEventListener('input', sort);
+
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSort = btn.dataset.sort;
+                sort();
+            });
+        });
+
+        document.querySelectorAll('.options-row input').forEach(input => {
+            input.addEventListener('change', sort);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputText.value);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

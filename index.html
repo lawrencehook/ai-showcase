@@ -11,6 +11,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scrollbar-gutter: stable;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #1a1a1a;
@@ -19,38 +23,37 @@
         }
 
         header {
-            text-align: center;
-            padding: 40px 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: #fff;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .subtitle {
-            font-size: 1rem;
-            color: #888;
-            max-width: 500px;
-            margin: 0 auto;
+            font-size: 0.9rem;
+            color: #666;
         }
 
-        .filters {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px 16px;
+        .header-search {
+            width: 280px;
         }
 
-        .search-container {
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .search-input {
+        .header-search .search-input {
             width: 100%;
-            max-width: 400px;
             padding: 10px 14px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,13 +63,63 @@
             outline: none;
         }
 
-        .search-input:focus {
+        .header-search .search-input:focus {
             border-color: rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.08);
         }
 
-        .search-input::placeholder {
+        .header-search .search-input::placeholder {
             color: #666;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .header-search {
+                width: 100%;
+            }
+        }
+
+        .filters {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 16px;
+        }
+
+        .tags-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .tags-toggle {
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tags-toggle:hover {
+            color: #888;
+        }
+
+        .tags-toggle .arrow {
+            transition: transform 0.2s;
+        }
+
+        .tags-toggle.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+
+        .tag-filters.collapsed {
+            display: none;
         }
 
         .category-filters {
@@ -86,6 +139,8 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.15s;
+            min-width: 90px;
+            text-align: center;
         }
 
         .category-filter:hover {
@@ -104,8 +159,7 @@
             flex-wrap: wrap;
             gap: 6px;
             justify-content: center;
-            height: 52px;
-            overflow: hidden;
+            min-height: 52px;
             align-content: flex-start;
         }
 
@@ -117,11 +171,12 @@
             color: #666;
             font-size: 0.7rem;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: color 0.15s, opacity 0.15s;
+            min-width: 70px;
+            text-align: center;
         }
 
-        .tag-filter:hover {
-            background: rgba(255, 255, 255, 0.08);
+        .tag-filter:hover:not(.unavailable) {
             color: #888;
         }
 
@@ -129,6 +184,11 @@
             background: rgba(78, 205, 196, 0.15);
             border-color: rgba(78, 205, 196, 0.3);
             color: #4ecdc4;
+        }
+
+        .tag-filter.unavailable {
+            opacity: 0.25;
+            cursor: default;
         }
 
         .results-count {
@@ -268,16 +328,23 @@
 </head>
 <body>
     <header>
-        <h1>AI Showcase</h1>
-        <p class="subtitle">Interactive demos showcasing what AI can create</p>
+        <div class="header-left">
+            <h1>AI Showcase</h1>
+            <p class="subtitle">Interactive demos showcasing what AI can create</p>
+        </div>
+        <div class="header-search">
+            <input type="text" class="search-input" id="search" placeholder="Search demos...">
+        </div>
     </header>
 
     <div class="filters">
-        <div class="search-container">
-            <input type="text" class="search-input" id="search" placeholder="Search demos...">
-        </div>
         <div class="category-filters" id="categoryFilters"></div>
-        <div class="tag-filters" id="tagFilters"></div>
+        <div class="tags-header">
+            <button class="tags-toggle" id="tagsToggle">
+                <span class="arrow">▼</span> Tags
+            </button>
+        </div>
+        <div class="tag-filters collapsed" id="tagFilters"></div>
         <div class="results-count" id="resultsCount"></div>
     </div>
 
@@ -285,7 +352,7 @@
     </main>
 
     <footer>
-        <p>Built with AI • <a href="https://github.com" target="_blank">View on GitHub</a></p>
+        <p>Built with AI • <a href="https://github.com/lawrencehook/ai-showcase" target="_blank">View on GitHub</a></p>
     </footer>
 
     <script>
@@ -362,7 +429,7 @@
             `).join('');
 
             container.addEventListener('click', e => {
-                if (e.target.classList.contains('tag-filter')) {
+                if (e.target.classList.contains('tag-filter') && !e.target.classList.contains('unavailable')) {
                     const tag = e.target.dataset.tag;
                     if (selectedTags.has(tag)) {
                         selectedTags.delete(tag);
@@ -406,14 +473,14 @@
             const availableTags = new Set();
             filtered.forEach(app => app.tags.forEach(tag => availableTags.add(tag)));
 
-            // Update tag filter visibility (show available tags + selected tags for deselection)
+            // Update tag filter availability (gray out unavailable tags)
             const tagContainer = document.getElementById('tagFilters');
             tagContainer.querySelectorAll('.tag-filter').forEach(btn => {
                 const tag = btn.dataset.tag;
                 if (availableTags.has(tag) || selectedTags.has(tag)) {
-                    btn.style.display = '';
+                    btn.classList.remove('unavailable');
                 } else {
-                    btn.style.display = 'none';
+                    btn.classList.add('unavailable');
                 }
             });
 
@@ -471,6 +538,14 @@
         document.getElementById('search').addEventListener('input', e => {
             searchQuery = e.target.value;
             filterAndRender();
+        });
+
+        // Tags toggle
+        document.getElementById('tagsToggle').addEventListener('click', () => {
+            const toggle = document.getElementById('tagsToggle');
+            const tags = document.getElementById('tagFilters');
+            toggle.classList.toggle('collapsed');
+            tags.classList.toggle('collapsed');
         });
 
         loadApps();

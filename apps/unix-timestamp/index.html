@@ -194,6 +194,28 @@
     <script>
         let unit = 's';
 
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('ts')) document.getElementById('timestampInput').value = params.get('ts');
+            if (params.has('unit')) {
+                unit = params.get('unit');
+                document.querySelectorAll('.unit-btn').forEach(b => b.classList.toggle('active', b.dataset.unit === unit));
+            }
+            if (params.has('date')) document.getElementById('dateInput').value = params.get('date');
+            if (params.has('time')) document.getElementById('timeInput').value = params.get('time');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            const ts = document.getElementById('timestampInput').value;
+            if (ts) params.set('ts', ts);
+            params.set('unit', unit);
+            params.set('date', document.getElementById('dateInput').value);
+            params.set('time', document.getElementById('timeInput').value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
         // Update current timestamp
         function updateCurrent() {
             const now = Math.floor(Date.now() / 1000);
@@ -219,11 +241,12 @@
                 btn.classList.add('active');
                 unit = btn.dataset.unit;
                 convertTimestamp();
+                updateURL();
             });
         });
 
         // Timestamp to date
-        document.getElementById('timestampInput').addEventListener('input', convertTimestamp);
+        document.getElementById('timestampInput').addEventListener('input', () => { convertTimestamp(); updateURL(); });
 
         function convertTimestamp() {
             const input = document.getElementById('timestampInput').value.trim();
@@ -270,8 +293,10 @@
         dateInput.value = now.toISOString().split('T')[0];
         timeInput.value = now.toTimeString().slice(0, 8);
 
-        dateInput.addEventListener('change', convertDate);
-        timeInput.addEventListener('change', convertDate);
+        loadFromURL();
+
+        dateInput.addEventListener('change', () => { convertDate(); updateURL(); });
+        timeInput.addEventListener('change', () => { convertDate(); updateURL(); });
 
         function convertDate() {
             const dateStr = dateInput.value;

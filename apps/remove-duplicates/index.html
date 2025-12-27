@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Duplicate Lines - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option input { accent-color: #4ecdc4; }
+        .option label { color: #888; font-size: 0.9rem; }
+        .editors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 768px) {
+            .editors { grid-template-columns: 1fr; }
+        }
+        .editor-panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .editor-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-title { color: #888; font-size: 0.9rem; }
+        .line-count { color: #4ecdc4; font-size: 0.85rem; font-family: monospace; }
+        textarea {
+            width: 100%;
+            min-height: 350px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 16px 20px;
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .stat { color: #888; font-size: 0.9rem; }
+        .stat span { color: #4ecdc4; font-weight: 600; }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Remove Duplicate Lines</h1>
+        <p class="subtitle">Remove duplicate lines from text, keeping only unique entries.</p>
+
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="caseSensitive" checked>
+                <label for="caseSensitive">Case sensitive</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="trimWhitespace" checked>
+                <label for="trimWhitespace">Trim whitespace</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="removeEmpty" checked>
+                <label for="removeEmpty">Remove empty lines</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="preserveOrder" checked>
+                <label for="preserveOrder">Preserve original order</label>
+            </div>
+        </div>
+
+        <div class="editors">
+            <div class="editor-panel">
+                <div class="editor-header">
+                    <span class="editor-title">Input</span>
+                    <span class="line-count" id="inputCount">0 lines</span>
+                </div>
+                <textarea id="inputText" placeholder="Paste your text with duplicate lines here..."></textarea>
+            </div>
+            <div class="editor-panel">
+                <div class="editor-header">
+                    <span class="editor-title">Output (Unique Lines)</span>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                </div>
+                <textarea id="outputText" readonly placeholder="Unique lines will appear here..."></textarea>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">Original lines: <span id="statOriginal">0</span></div>
+            <div class="stat">Unique lines: <span id="statUnique">0</span></div>
+            <div class="stat">Duplicates removed: <span id="statRemoved">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+
+        function process() {
+            const caseSensitive = document.getElementById('caseSensitive').checked;
+            const trimWhitespace = document.getElementById('trimWhitespace').checked;
+            const removeEmpty = document.getElementById('removeEmpty').checked;
+            const preserveOrder = document.getElementById('preserveOrder').checked;
+
+            let lines = inputText.value.split('\n');
+            const originalCount = lines.length;
+
+            if (trimWhitespace) {
+                lines = lines.map(line => line.trim());
+            }
+
+            if (removeEmpty) {
+                lines = lines.filter(line => line.length > 0);
+            }
+
+            const seen = new Set();
+            const unique = [];
+
+            for (const line of lines) {
+                const key = caseSensitive ? line : line.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(line);
+                }
+            }
+
+            let result = unique;
+            if (!preserveOrder) {
+                result = result.sort((a, b) => {
+                    const aLower = a.toLowerCase();
+                    const bLower = b.toLowerCase();
+                    return aLower.localeCompare(bLower);
+                });
+            }
+
+            outputText.value = result.join('\n');
+
+            // Update stats
+            const linesAfterEmpty = removeEmpty ? lines.length : originalCount;
+            document.getElementById('inputCount').textContent = originalCount + ' lines';
+            document.getElementById('statOriginal').textContent = originalCount;
+            document.getElementById('statUnique').textContent = unique.length;
+            document.getElementById('statRemoved').textContent = linesAfterEmpty - unique.length;
+        }
+
+        inputText.addEventListener('input', process);
+        document.querySelectorAll('.options input').forEach(input => {
+            input.addEventListener('change', process);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputText.value);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

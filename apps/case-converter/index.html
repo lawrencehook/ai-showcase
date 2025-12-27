@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Converter - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .editor-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+        .case-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .case-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .case-btn:hover {
+            background: rgba(78, 205, 196, 0.1);
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+        .case-btn.active {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.5);
+        }
+        .case-name {
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .case-example {
+            color: #4ecdc4;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        .output-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .output-label { color: #888; font-size: 0.9rem; }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .output-text {
+            padding: 20px;
+            min-height: 150px;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Case Converter</h1>
+        <p class="subtitle">Convert text between different letter cases instantly.</p>
+
+        <div class="editor-container">
+            <textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+        </div>
+
+        <div class="case-buttons">
+            <button class="case-btn active" data-case="lower">
+                <div class="case-name">lowercase</div>
+                <div class="case-example">all letters small</div>
+            </button>
+            <button class="case-btn" data-case="upper">
+                <div class="case-name">UPPERCASE</div>
+                <div class="case-example">ALL LETTERS CAPITAL</div>
+            </button>
+            <button class="case-btn" data-case="title">
+                <div class="case-name">Title Case</div>
+                <div class="case-example">Capitalize Each Word</div>
+            </button>
+            <button class="case-btn" data-case="sentence">
+                <div class="case-name">Sentence case</div>
+                <div class="case-example">First letter capital</div>
+            </button>
+            <button class="case-btn" data-case="camel">
+                <div class="case-name">camelCase</div>
+                <div class="case-example">wordsJoinedLikeThis</div>
+            </button>
+            <button class="case-btn" data-case="pascal">
+                <div class="case-name">PascalCase</div>
+                <div class="case-example">WordsJoinedLikeThis</div>
+            </button>
+            <button class="case-btn" data-case="snake">
+                <div class="case-name">snake_case</div>
+                <div class="case-example">words_joined_like_this</div>
+            </button>
+            <button class="case-btn" data-case="kebab">
+                <div class="case-name">kebab-case</div>
+                <div class="case-example">words-joined-like-this</div>
+            </button>
+            <button class="case-btn" data-case="constant">
+                <div class="case-name">CONSTANT_CASE</div>
+                <div class="case-example">WORDS_JOINED_LIKE_THIS</div>
+            </button>
+            <button class="case-btn" data-case="toggle">
+                <div class="case-name">tOGGLE cASE</div>
+                <div class="case-example">sWAP uPPER/lOWER</div>
+            </button>
+            <button class="case-btn" data-case="alternating">
+                <div class="case-name">aLtErNaTiNg</div>
+                <div class="case-example">eVeRy OtHeR lEtTeR</div>
+            </button>
+            <button class="case-btn" data-case="dot">
+                <div class="case-name">dot.case</div>
+                <div class="case-example">words.joined.like.this</div>
+            </button>
+        </div>
+
+        <div class="output-container">
+            <div class="output-header">
+                <span class="output-label">Output</span>
+                <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+            </div>
+            <div class="output-text" id="outputText"></div>
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const outputText = document.getElementById('outputText');
+        let currentCase = 'lower';
+
+        const converters = {
+            lower: text => text.toLowerCase(),
+            upper: text => text.toUpperCase(),
+            title: text => text.toLowerCase().replace(/(?:^|\s|[-"'([{])\S/g, char => char.toUpperCase()),
+            sentence: text => {
+                return text.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, char => char.toUpperCase());
+            },
+            camel: text => {
+                return text.toLowerCase()
+                    .replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase())
+                    .replace(/^[A-Z]/, char => char.toLowerCase());
+            },
+            pascal: text => {
+                return text.toLowerCase()
+                    .replace(/(^|[^a-zA-Z0-9]+)(.)/g, (_, sep, char) => char.toUpperCase());
+            },
+            snake: text => {
+                return text.toLowerCase()
+                    .replace(/[^a-zA-Z0-9]+/g, '_')
+                    .replace(/^_|_$/g, '');
+            },
+            kebab: text => {
+                return text.toLowerCase()
+                    .replace(/[^a-zA-Z0-9]+/g, '-')
+                    .replace(/^-|-$/g, '');
+            },
+            constant: text => {
+                return text.toUpperCase()
+                    .replace(/[^A-Z0-9]+/g, '_')
+                    .replace(/^_|_$/g, '');
+            },
+            toggle: text => {
+                return text.split('').map(char => {
+                    return char === char.toUpperCase() ? char.toLowerCase() : char.toUpperCase();
+                }).join('');
+            },
+            alternating: text => {
+                let upper = false;
+                return text.split('').map(char => {
+                    if (/[a-zA-Z]/.test(char)) {
+                        upper = !upper;
+                        return upper ? char.toUpperCase() : char.toLowerCase();
+                    }
+                    return char;
+                }).join('');
+            },
+            dot: text => {
+                return text.toLowerCase()
+                    .replace(/[^a-zA-Z0-9]+/g, '.')
+                    .replace(/^\.|\.$/g, '');
+            }
+        };
+
+        function updateOutput() {
+            const text = textInput.value;
+            outputText.textContent = converters[currentCase](text);
+        }
+
+        textInput.addEventListener('input', updateOutput);
+
+        document.querySelectorAll('.case-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCase = btn.dataset.case;
+                updateOutput();
+            });
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputText.textContent);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy to Clipboard';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

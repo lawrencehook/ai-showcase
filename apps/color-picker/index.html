@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .picker-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .color-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background-color 0.2s;
+        }
+        .picker-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .native-picker {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .native-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .native-picker::-webkit-color-swatch { border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); }
+        .sliders { flex: 1; }
+        .slider-group {
+            margin-bottom: 12px;
+        }
+        .slider-group:last-child { margin-bottom: 0; }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .slider-label { color: #888; font-size: 0.85rem; }
+        .slider-value { color: #4ecdc4; font-family: monospace; font-size: 0.85rem; }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .range-r { background: linear-gradient(to right, #000, #ff0000) !important; }
+        .range-g { background: linear-gradient(to right, #000, #00ff00) !important; }
+        .range-b { background: linear-gradient(to right, #000, #0000ff) !important; }
+        .values-card {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .value-row:last-child { border-bottom: none; }
+        .value-label { color: #888; font-size: 0.9rem; }
+        .value-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .value-text {
+            font-family: monospace;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .copy-btn.copied { background: rgba(78, 205, 196, 0.5); }
+        .history-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .history-title { color: #666; font-size: 0.85rem; margin-bottom: 12px; }
+        .history-colors {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .history-color {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .history-color:hover { border-color: rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Color Picker</h1>
+        <p class="subtitle">Pick colors and get values in multiple formats.</p>
+
+        <div class="picker-card">
+            <div class="color-preview" id="colorPreview"></div>
+
+            <div class="picker-row">
+                <input type="color" class="native-picker" id="nativePicker" value="#4ecdc4">
+                <div class="sliders">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Red</span>
+                            <span class="slider-value" id="rValue">78</span>
+                        </div>
+                        <input type="range" class="range-r" id="rSlider" min="0" max="255" value="78">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Green</span>
+                            <span class="slider-value" id="gValue">205</span>
+                        </div>
+                        <input type="range" class="range-g" id="gSlider" min="0" max="255" value="205">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Blue</span>
+                            <span class="slider-value" id="bValue">196</span>
+                        </div>
+                        <input type="range" class="range-b" id="bSlider" min="0" max="255" value="196">
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <div class="history-title">Recent Colors</div>
+                <div class="history-colors" id="historyColors"></div>
+            </div>
+        </div>
+
+        <div class="values-card">
+            <div class="value-row">
+                <span class="value-label">HEX</span>
+                <div class="value-content">
+                    <span class="value-text" id="hexValue">#4ecdc4</span>
+                    <button class="copy-btn" data-target="hexValue">Copy</button>
+                </div>
+            </div>
+            <div class="value-row">
+                <span class="value-label">RGB</span>
+                <div class="value-content">
+                    <span class="value-text" id="rgbValue">rgb(78, 205, 196)</span>
+                    <button class="copy-btn" data-target="rgbValue">Copy</button>
+                </div>
+            </div>
+            <div class="value-row">
+                <span class="value-label">HSL</span>
+                <div class="value-content">
+                    <span class="value-text" id="hslValue">hsl(176, 56%, 55%)</span>
+                    <button class="copy-btn" data-target="hslValue">Copy</button>
+                </div>
+            </div>
+            <div class="value-row">
+                <span class="value-label">HSV</span>
+                <div class="value-content">
+                    <span class="value-text" id="hsvValue">hsv(176, 62%, 80%)</span>
+                    <button class="copy-btn" data-target="hsvValue">Copy</button>
+                </div>
+            </div>
+            <div class="value-row">
+                <span class="value-label">CMYK</span>
+                <div class="value-content">
+                    <span class="value-text" id="cmykValue">cmyk(62%, 0%, 4%, 20%)</span>
+                    <button class="copy-btn" data-target="cmykValue">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let r = 78, g = 205, b = 196;
+        let colorHistory = [];
+
+        const rSlider = document.getElementById('rSlider');
+        const gSlider = document.getElementById('gSlider');
+        const bSlider = document.getElementById('bSlider');
+        const nativePicker = document.getElementById('nativePicker');
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, v = max;
+            const d = max - min;
+            s = max === 0 ? 0 : d / max;
+
+            if (max === min) {
+                h = 0;
+            } else {
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+        }
+
+        function rgbToCmyk(r, g, b) {
+            if (r === 0 && g === 0 && b === 0) {
+                return { c: 0, m: 0, y: 0, k: 100 };
+            }
+            const c = 1 - (r / 255);
+            const m = 1 - (g / 255);
+            const y = 1 - (b / 255);
+            const k = Math.min(c, m, y);
+            return {
+                c: Math.round(((c - k) / (1 - k)) * 100),
+                m: Math.round(((m - k) / (1 - k)) * 100),
+                y: Math.round(((y - k) / (1 - k)) * 100),
+                k: Math.round(k * 100)
+            };
+        }
+
+        function updateDisplay() {
+            const hex = rgbToHex(r, g, b);
+            const hsl = rgbToHsl(r, g, b);
+            const hsv = rgbToHsv(r, g, b);
+            const cmyk = rgbToCmyk(r, g, b);
+
+            document.getElementById('colorPreview').style.backgroundColor = hex;
+            document.getElementById('rValue').textContent = r;
+            document.getElementById('gValue').textContent = g;
+            document.getElementById('bValue').textContent = b;
+
+            document.getElementById('hexValue').textContent = hex;
+            document.getElementById('rgbValue').textContent = `rgb(${r}, ${g}, ${b})`;
+            document.getElementById('hslValue').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('hsvValue').textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+            document.getElementById('cmykValue').textContent = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+
+            nativePicker.value = hex;
+        }
+
+        function addToHistory(hex) {
+            if (colorHistory[0] === hex) return;
+            colorHistory = [hex, ...colorHistory.filter(c => c !== hex)].slice(0, 10);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyColors');
+            container.innerHTML = colorHistory.map(hex =>
+                `<div class="history-color" style="background-color: ${hex}" data-color="${hex}"></div>`
+            ).join('');
+
+            container.querySelectorAll('.history-color').forEach(el => {
+                el.addEventListener('click', () => {
+                    const rgb = hexToRgb(el.dataset.color);
+                    r = rgb.r; g = rgb.g; b = rgb.b;
+                    rSlider.value = r; gSlider.value = g; bSlider.value = b;
+                    updateDisplay();
+                });
+            });
+        }
+
+        rSlider.addEventListener('input', () => { r = parseInt(rSlider.value); updateDisplay(); });
+        gSlider.addEventListener('input', () => { g = parseInt(gSlider.value); updateDisplay(); });
+        bSlider.addEventListener('input', () => { b = parseInt(bSlider.value); updateDisplay(); });
+
+        rSlider.addEventListener('change', () => addToHistory(rgbToHex(r, g, b)));
+        gSlider.addEventListener('change', () => addToHistory(rgbToHex(r, g, b)));
+        bSlider.addEventListener('change', () => addToHistory(rgbToHex(r, g, b)));
+
+        nativePicker.addEventListener('input', () => {
+            const rgb = hexToRgb(nativePicker.value);
+            r = rgb.r; g = rgb.g; b = rgb.b;
+            rSlider.value = r; gSlider.value = g; bSlider.value = b;
+            updateDisplay();
+        });
+
+        nativePicker.addEventListener('change', () => addToHistory(rgbToHex(r, g, b)));
+
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const text = document.getElementById(btn.dataset.target).textContent;
+                navigator.clipboard.writeText(text);
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        });
+
+        updateDisplay();
+        addToHistory('#4ecdc4');
+    </script>
+</body>
+</html>

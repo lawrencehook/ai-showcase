@@ -199,6 +199,24 @@
             toSelect.add(new Option(`${tz.city} - ${tz.name}`, tz.id));
         });
 
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('date')) document.getElementById('inputDate').value = params.get('date');
+            if (params.has('time')) document.getElementById('inputTime').value = params.get('time');
+            if (params.has('from')) fromSelect.value = params.get('from');
+            if (params.has('to')) toSelect.value = params.get('to');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('date', document.getElementById('inputDate').value);
+            params.set('time', document.getElementById('inputTime').value);
+            params.set('from', fromSelect.value);
+            params.set('to', toSelect.value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
         // Set defaults
         const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         fromSelect.value = localTz || 'America/New_York';
@@ -210,13 +228,16 @@
             document.getElementById('inputDate').value = now.toISOString().split('T')[0];
             document.getElementById('inputTime').value = now.toTimeString().slice(0, 5);
             convert();
+            updateURL();
         }
 
+        loadFromURL();
+
         document.getElementById('nowBtn').addEventListener('click', setNow);
-        document.getElementById('inputDate').addEventListener('change', convert);
-        document.getElementById('inputTime').addEventListener('change', convert);
-        fromSelect.addEventListener('change', convert);
-        toSelect.addEventListener('change', convert);
+        document.getElementById('inputDate').addEventListener('change', () => { convert(); updateURL(); });
+        document.getElementById('inputTime').addEventListener('change', () => { convert(); updateURL(); });
+        fromSelect.addEventListener('change', () => { convert(); updateURL(); });
+        toSelect.addEventListener('change', () => { convert(); updateURL(); });
 
         function convert() {
             const dateStr = document.getElementById('inputDate').value;

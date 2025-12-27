@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorem Ipsum Generator - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .control-group {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .control-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .control-row {
+            display: flex;
+            gap: 8px;
+        }
+        input[type="number"] {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        input[type="number"]:focus { outline: none; border-color: #4ecdc4; }
+        select {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-item input { accent-color: #4ecdc4; }
+        .checkbox-item label { color: #888; font-size: 0.9rem; margin: 0; }
+        .generate-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 14px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .generate-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .output-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .output-stats { color: #666; font-size: 0.85rem; }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .output-text {
+            padding: 20px;
+            min-height: 200px;
+            font-size: 1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .output-text p {
+            margin-bottom: 1em;
+        }
+        .output-text p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Lorem Ipsum Generator</h1>
+        <p class="subtitle">Generate placeholder text for designs and layouts.</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Amount</label>
+                <div class="control-row">
+                    <input type="number" id="amount" value="5" min="1" max="100">
+                    <select id="unit">
+                        <option value="paragraphs">Paragraphs</option>
+                        <option value="sentences">Sentences</option>
+                        <option value="words">Words</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Options</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="startLorem" checked>
+                        <label for="startLorem">Start with "Lorem ipsum..."</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="includeHtml">
+                        <label for="includeHtml">Include &lt;p&gt; tags</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn">Generate Lorem Ipsum</button>
+
+        <div class="output-container">
+            <div class="output-header">
+                <span class="output-stats" id="outputStats">0 words, 0 characters</span>
+                <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+            </div>
+            <div class="output-text" id="outputText"></div>
+        </div>
+    </div>
+
+    <script>
+        const loremWords = [
+            'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
+            'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
+            'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud',
+            'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo',
+            'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit', 'voluptate',
+            'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint',
+            'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia',
+            'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum', 'perspiciatis', 'unde',
+            'omnis', 'iste', 'natus', 'error', 'voluptatem', 'accusantium', 'doloremque',
+            'laudantium', 'totam', 'rem', 'aperiam', 'eaque', 'ipsa', 'quae', 'ab', 'illo',
+            'inventore', 'veritatis', 'quasi', 'architecto', 'beatae', 'vitae', 'dicta',
+            'explicabo', 'nemo', 'ipsam', 'quia', 'voluptas', 'aspernatur', 'aut', 'odit',
+            'fugit', 'consequuntur', 'magni', 'dolores', 'eos', 'ratione', 'sequi',
+            'nesciunt', 'neque', 'porro', 'quisquam', 'dolorem', 'adipisci', 'numquam',
+            'eius', 'modi', 'tempora', 'magnam', 'quaerat', 'minima', 'nostrum',
+            'exercitationem', 'ullam', 'corporis', 'suscipit', 'laboriosam', 'aliquid',
+            'commodi', 'consequatur', 'autem', 'vel', 'eum', 'iure', 'quam', 'nihil',
+            'molestiae', 'illum', 'quo', 'voluptas', 'assumenda', 'repudiandae'
+        ];
+
+        const firstSentence = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+        function randomWord() {
+            return loremWords[Math.floor(Math.random() * loremWords.length)];
+        }
+
+        function generateSentence(minWords = 8, maxWords = 15) {
+            const length = Math.floor(Math.random() * (maxWords - minWords + 1)) + minWords;
+            const words = [];
+            for (let i = 0; i < length; i++) {
+                words.push(randomWord());
+            }
+            words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+
+            // Add comma sometimes
+            if (length > 6 && Math.random() > 0.5) {
+                const commaPos = Math.floor(length / 2) + Math.floor(Math.random() * 3) - 1;
+                words[commaPos] += ',';
+            }
+
+            return words.join(' ') + '.';
+        }
+
+        function generateParagraph(minSentences = 4, maxSentences = 8) {
+            const length = Math.floor(Math.random() * (maxSentences - minSentences + 1)) + minSentences;
+            const sentences = [];
+            for (let i = 0; i < length; i++) {
+                sentences.push(generateSentence());
+            }
+            return sentences.join(' ');
+        }
+
+        function generate() {
+            const amount = parseInt(document.getElementById('amount').value) || 5;
+            const unit = document.getElementById('unit').value;
+            const startWithLorem = document.getElementById('startLorem').checked;
+            const includeHtml = document.getElementById('includeHtml').checked;
+
+            let result = [];
+
+            if (unit === 'paragraphs') {
+                for (let i = 0; i < amount; i++) {
+                    let para = generateParagraph();
+                    if (i === 0 && startWithLorem) {
+                        para = firstSentence + ' ' + para;
+                    }
+                    result.push(para);
+                }
+                if (includeHtml) {
+                    result = result.map(p => `<p>${p}</p>`);
+                }
+            } else if (unit === 'sentences') {
+                for (let i = 0; i < amount; i++) {
+                    if (i === 0 && startWithLorem) {
+                        result.push(firstSentence);
+                    } else {
+                        result.push(generateSentence());
+                    }
+                }
+            } else if (unit === 'words') {
+                if (startWithLorem) {
+                    result = ['Lorem', 'ipsum', 'dolor', 'sit', 'amet'];
+                    for (let i = result.length; i < amount; i++) {
+                        result.push(randomWord());
+                    }
+                    result = result.slice(0, amount);
+                } else {
+                    for (let i = 0; i < amount; i++) {
+                        result.push(randomWord());
+                    }
+                }
+            }
+
+            const output = unit === 'words' ? result.join(' ') : result.join('\n\n');
+            document.getElementById('outputText').innerText = output;
+
+            // Update stats
+            const wordCount = output.split(/\s+/).filter(w => w.length > 0).length;
+            const charCount = output.length;
+            document.getElementById('outputStats').textContent = `${wordCount} words, ${charCount} characters`;
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', generate);
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('outputText').innerText);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy to Clipboard';
+            }, 1500);
+        });
+
+        // Generate on load
+        generate();
+    </script>
+</body>
+</html>

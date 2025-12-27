@@ -188,7 +188,22 @@
         const birthdateInput = document.getElementById('birthdate');
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        birthdateInput.addEventListener('change', calculate);
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('dob')) birthdateInput.value = params.get('dob');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            if (birthdateInput.value) params.set('dob', birthdateInput.value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
+        loadFromURL();
+        if (birthdateInput.value) calculate();
+
+        birthdateInput.addEventListener('change', () => { calculate(); updateURL(); });
 
         function calculate() {
             const birthdate = new Date(birthdateInput.value);

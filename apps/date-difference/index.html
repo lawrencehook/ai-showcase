@@ -196,6 +196,20 @@
         const startInput = document.getElementById('startDate');
         const endInput = document.getElementById('endDate');
 
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('start')) startInput.value = params.get('start');
+            if (params.has('end')) endInput.value = params.get('end');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            if (startInput.value) params.set('start', startInput.value);
+            if (endInput.value) params.set('end', endInput.value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
         // Set default dates
         const today = new Date();
         const nextMonth = new Date(today);
@@ -204,14 +218,17 @@
         startInput.value = formatDateInput(today);
         endInput.value = formatDateInput(nextMonth);
 
-        startInput.addEventListener('change', calculate);
-        endInput.addEventListener('change', calculate);
+        loadFromURL();
+
+        startInput.addEventListener('change', () => { calculate(); updateURL(); });
+        endInput.addEventListener('change', () => { calculate(); updateURL(); });
 
         document.getElementById('swapBtn').addEventListener('click', () => {
             const temp = startInput.value;
             startInput.value = endInput.value;
             endInput.value = temp;
             calculate();
+            updateURL();
         });
 
         document.querySelectorAll('.quick-pick').forEach(btn => {
@@ -235,6 +252,7 @@
                         break;
                 }
                 calculate();
+                updateURL();
             });
         });
 

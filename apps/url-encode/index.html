@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Encode/Decode - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #888;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover { background: rgba(255,255,255,0.06); }
+        .mode-btn.active {
+            background: rgba(78, 205, 196, 0.15);
+            border-color: rgba(78, 205, 196, 0.5);
+            color: #4ecdc4;
+        }
+        .options {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option input[type="radio"],
+        .option input[type="checkbox"] { accent-color: #4ecdc4; }
+        .option label { color: #888; font-size: 0.9rem; }
+        .editor-panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .editor-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-title { color: #888; font-size: 0.9rem; }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+        .arrow {
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            color: #4ecdc4;
+            font-size: 1.5rem;
+        }
+        .output-panel {
+            background: rgba(78, 205, 196, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+        }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        .error-message {
+            padding: 12px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border-top: 1px solid rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .common-chars {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .common-chars h3 {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        .chars-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        .char-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        .char-original { color: #888; }
+        .char-encoded { color: #4ecdc4; }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>URL Encode/Decode</h1>
+        <p class="subtitle">Encode and decode URL components and query strings.</p>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="encode">Encode</button>
+            <button class="mode-btn" data-mode="decode">Decode</button>
+        </div>
+
+        <div class="options">
+            <div class="option">
+                <input type="radio" name="encodeType" id="encodeComponent" checked>
+                <label for="encodeComponent">encodeURIComponent</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="encodeType" id="encodeURI">
+                <label for="encodeURI">encodeURI (preserve URL structure)</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="encodePlus">
+                <label for="encodePlus">Encode spaces as +</label>
+            </div>
+        </div>
+
+        <div class="editor-panel">
+            <div class="editor-header">
+                <span class="editor-title" id="inputLabel">Text to Encode</span>
+            </div>
+            <textarea id="inputText" placeholder="Enter text or URL to encode...
+
+Example: Hello World! Special chars: @#$%&*"></textarea>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="editor-panel output-panel">
+            <div class="editor-header">
+                <span class="editor-title" id="outputLabel">Encoded Output</span>
+                <button class="copy-btn" id="copyBtn">Copy</button>
+            </div>
+            <textarea id="outputText" readonly placeholder="Result will appear here..."></textarea>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="common-chars">
+            <h3>Common URL Encodings</h3>
+            <div class="chars-table">
+                <div class="char-item"><span class="char-original">Space</span><span class="char-encoded">%20</span></div>
+                <div class="char-item"><span class="char-original">!</span><span class="char-encoded">%21</span></div>
+                <div class="char-item"><span class="char-original">#</span><span class="char-encoded">%23</span></div>
+                <div class="char-item"><span class="char-original">$</span><span class="char-encoded">%24</span></div>
+                <div class="char-item"><span class="char-original">%</span><span class="char-encoded">%25</span></div>
+                <div class="char-item"><span class="char-original">&</span><span class="char-encoded">%26</span></div>
+                <div class="char-item"><span class="char-original">'</span><span class="char-encoded">%27</span></div>
+                <div class="char-item"><span class="char-original">+</span><span class="char-encoded">%2B</span></div>
+                <div class="char-item"><span class="char-original">/</span><span class="char-encoded">%2F</span></div>
+                <div class="char-item"><span class="char-original">:</span><span class="char-encoded">%3A</span></div>
+                <div class="char-item"><span class="char-original">=</span><span class="char-encoded">%3D</span></div>
+                <div class="char-item"><span class="char-original">?</span><span class="char-encoded">%3F</span></div>
+                <div class="char-item"><span class="char-original">@</span><span class="char-encoded">%40</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const inputLabel = document.getElementById('inputLabel');
+        const outputLabel = document.getElementById('outputLabel');
+        const errorMessage = document.getElementById('errorMessage');
+
+        let mode = 'encode';
+
+        function convert() {
+            const text = inputText.value;
+            const useEncodeURI = document.getElementById('encodeURI').checked;
+            const encodePlus = document.getElementById('encodePlus').checked;
+            errorMessage.style.display = 'none';
+
+            if (!text) {
+                outputText.value = '';
+                return;
+            }
+
+            try {
+                let result;
+                if (mode === 'encode') {
+                    if (useEncodeURI) {
+                        result = encodeURI(text);
+                    } else {
+                        result = encodeURIComponent(text);
+                    }
+                    if (encodePlus) {
+                        result = result.replace(/%20/g, '+');
+                    }
+                } else {
+                    let input = text;
+                    if (encodePlus) {
+                        input = input.replace(/\+/g, '%20');
+                    }
+                    if (useEncodeURI) {
+                        result = decodeURI(input);
+                    } else {
+                        result = decodeURIComponent(input);
+                    }
+                }
+                outputText.value = result;
+            } catch (e) {
+                outputText.value = '';
+                errorMessage.textContent = 'Error: ' + e.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function updateMode(newMode) {
+            mode = newMode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            if (mode === 'encode') {
+                inputLabel.textContent = 'Text to Encode';
+                outputLabel.textContent = 'Encoded Output';
+                inputText.placeholder = 'Enter text or URL to encode...';
+            } else {
+                inputLabel.textContent = 'Encoded Text';
+                outputLabel.textContent = 'Decoded Output';
+                inputText.placeholder = 'Enter encoded text to decode...';
+            }
+
+            convert();
+        }
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => updateMode(btn.dataset.mode));
+        });
+
+        inputText.addEventListener('input', convert);
+        document.querySelectorAll('.options input').forEach(input => {
+            input.addEventListener('change', convert);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputText.value);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

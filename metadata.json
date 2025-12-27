@@ -48,7 +48,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Mathematics",
-        "tags": ["fractal", "math", "interactive"],
+        "tags": ["fractal", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Mandelbrot_set"
     },
     {
@@ -61,7 +61,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Mathematics",
-        "tags": ["math", "visualization", "interactive"],
+        "tags": ["visualization", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Fourier_series"
     },
     {
@@ -74,7 +74,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Physics",
-        "tags": ["physics", "simulation", "interactive"],
+        "tags": ["simulation", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Computational_fluid_dynamics"
     },
     {
@@ -113,7 +113,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Physics",
-        "tags": ["physics", "simulation", "interactive"],
+        "tags": ["simulation", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Verlet_integration"
     },
     {
@@ -126,7 +126,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Computer Graphics",
-        "tags": ["3D", "graphics", "math"],
+        "tags": ["3D", "rendering"],
         "link": "https://en.wikipedia.org/wiki/Ray_marching"
     },
     {
@@ -139,7 +139,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Physics",
-        "tags": ["physics", "chaos", "simulation"],
+        "tags": ["chaos", "simulation"],
         "link": "https://en.wikipedia.org/wiki/Double_pendulum"
     },
     {
@@ -152,7 +152,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Computer Graphics",
-        "tags": ["graphics", "interactive", "organic"],
+        "tags": ["interactive", "organic"],
         "link": "https://en.wikipedia.org/wiki/Metaballs"
     },
     {
@@ -165,7 +165,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "geometry", "interactive"],
+        "tags": ["geometry", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Voronoi_diagram"
     },
     {
@@ -191,7 +191,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["procedural", "algorithm", "patterns"],
+        "tags": ["procedural", "patterns"],
         "link": "https://en.wikipedia.org/wiki/Wave_function_collapse"
     },
     {
@@ -204,7 +204,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Mathematics",
-        "tags": ["chaos", "3D", "physics"],
+        "tags": ["chaos", "3D"],
         "link": "https://en.wikipedia.org/wiki/Lorenz_system"
     },
     {
@@ -217,7 +217,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "visualization", "graphics"],
+        "tags": ["visualization", "contours"],
         "link": "https://en.wikipedia.org/wiki/Marching_squares"
     },
     {
@@ -230,7 +230,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "geometry", "interactive"],
+        "tags": ["geometry", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Delaunay_triangulation"
     },
     {
@@ -256,7 +256,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Physics",
-        "tags": ["physics", "simulation", "interactive"],
+        "tags": ["simulation", "interactive"],
         "link": "https://en.wikipedia.org/wiki/N-body_problem"
     },
     {
@@ -269,7 +269,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Mathematics",
-        "tags": ["math", "graphics", "interactive"],
+        "tags": ["curves", "interactive"],
         "link": "https://en.wikipedia.org/wiki/B%C3%A9zier_curve"
     },
     {
@@ -308,7 +308,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Computer Graphics",
-        "tags": ["retro", "graphics", "demoscene"],
+        "tags": ["retro", "demoscene"],
         "link": "https://en.wikipedia.org/wiki/Demoscene"
     },
     {
@@ -321,7 +321,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "procedural", "visualization"],
+        "tags": ["procedural", "visualization"],
         "link": "https://en.wikipedia.org/wiki/Maze_generation_algorithm"
     },
     {
@@ -334,7 +334,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Physics",
-        "tags": ["physics", "simulation", "interactive"],
+        "tags": ["simulation", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Hooke%27s_law"
     },
     {
@@ -347,7 +347,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Data Structures",
-        "tags": ["algorithm", "data structure", "visualization"],
+        "tags": ["spatial", "visualization"],
         "link": "https://en.wikipedia.org/wiki/Quadtree"
     },
     {
@@ -360,7 +360,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "interactive", "visualization"],
+        "tags": ["interactive", "visualization"],
         "link": "https://en.wikipedia.org/wiki/Synthesizer"
     },
     {
@@ -373,7 +373,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Computer Graphics",
-        "tags": ["graphics", "GPU", "art"],
+        "tags": ["GPU", "art"],
         "link": "https://en.wikipedia.org/wiki/Shader"
     },
     {
@@ -386,7 +386,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "AI", "interactive"],
+        "tags": ["AI", "pathfinding", "interactive"],
         "link": "https://en.wikipedia.org/wiki/A*_search_algorithm"
     },
     {
@@ -399,7 +399,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "visualization", "comparison"],
+        "tags": ["visualization", "comparison"],
         "link": "https://en.wikipedia.org/wiki/Sorting_algorithm"
     },
     {
@@ -412,7 +412,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "graph", "pathfinding"],
+        "tags": ["graph", "pathfinding"],
         "link": "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm"
     },
     {
@@ -425,7 +425,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "graph", "comparison"],
+        "tags": ["graph", "comparison"],
         "link": "https://en.wikipedia.org/wiki/Graph_traversal"
     },
     {
@@ -438,7 +438,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "geometry", "interactive"],
+        "tags": ["geometry", "interactive"],
         "link": "https://en.wikipedia.org/wiki/Convex_hull"
     },
     {
@@ -464,7 +464,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "graph", "optimization"],
+        "tags": ["graph", "optimization"],
         "link": "https://en.wikipedia.org/wiki/Minimum_spanning_tree"
     },
     {
@@ -477,7 +477,7 @@
         "dateCreated": "2024-12-24",
         "model": "Claude Opus 4.5",
         "category": "Algorithms",
-        "tags": ["algorithm", "compression", "tree"],
+        "tags": ["compression", "tree"],
         "link": "https://en.wikipedia.org/wiki/Huffman_coding"
     },
     {
@@ -529,7 +529,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -542,7 +542,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -555,7 +555,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -568,7 +568,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -581,7 +581,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -594,7 +594,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "files"],
+        "tags": ["utility", "files"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -607,7 +607,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "conversion", "images"],
+        "tags": ["conversion", "export"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -620,7 +620,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "security"],
+        "tags": ["utility", "security"],
         "link": "https://en.wikipedia.org/wiki/Watermark"
     },
     {
@@ -633,7 +633,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "utility", "formatting"],
+        "tags": ["utility", "formatting"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -646,7 +646,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "text", "extraction"],
+        "tags": ["extraction", "utility"],
         "link": "https://en.wikipedia.org/wiki/PDF"
     },
     {
@@ -659,7 +659,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "PDF",
-        "tags": ["pdf", "security", "privacy"],
+        "tags": ["security", "privacy"],
         "link": "https://en.wikipedia.org/wiki/Redaction"
     },
     {
@@ -672,7 +672,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "utility", "resize"],
+        "tags": ["utility", "resize"],
         "link": "https://en.wikipedia.org/wiki/Image_scaling"
     },
     {
@@ -685,7 +685,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "utility", "crop"],
+        "tags": ["utility", "crop"],
         "link": "https://en.wikipedia.org/wiki/Cropping_(image)"
     },
     {
@@ -698,7 +698,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "utility", "rotate"],
+        "tags": ["utility", "rotate"],
         "link": "https://en.wikipedia.org/wiki/Image_rotation"
     },
     {
@@ -711,7 +711,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "conversion", "utility"],
+        "tags": ["conversion", "utility"],
         "link": "https://en.wikipedia.org/wiki/Image_file_format"
     },
     {
@@ -724,7 +724,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "filters", "effects"],
+        "tags": ["filters", "effects"],
         "link": "https://en.wikipedia.org/wiki/Image_editing"
     },
     {
@@ -737,7 +737,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Images",
-        "tags": ["images", "watermark", "security"],
+        "tags": ["watermark", "security"],
         "link": "https://en.wikipedia.org/wiki/Digital_watermarking"
     },
     {
@@ -750,7 +750,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "utility", "numbers"],
+        "tags": ["utility", "numbers"],
         "link": "https://en.wikipedia.org/wiki/Random_number_generation"
     },
     {
@@ -763,7 +763,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "security", "password"],
+        "tags": ["security", "password"],
         "link": "https://en.wikipedia.org/wiki/Password_strength"
     },
     {
@@ -776,7 +776,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "games", "dice"],
+        "tags": ["games", "dice"],
         "link": "https://en.wikipedia.org/wiki/Dice"
     },
     {
@@ -789,7 +789,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "games", "probability"],
+        "tags": ["games", "probability"],
         "link": "https://en.wikipedia.org/wiki/Coin_flipping"
     },
     {
@@ -802,7 +802,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "utility", "lists"],
+        "tags": ["utility", "lists"],
         "link": "https://en.wikipedia.org/wiki/Randomization"
     },
     {
@@ -815,7 +815,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Random",
-        "tags": ["random", "utility", "developer"],
+        "tags": ["utility", "identifiers"],
         "link": "https://en.wikipedia.org/wiki/Universally_unique_identifier"
     },
     {
@@ -828,7 +828,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "timer"],
+        "tags": ["utility", "timer"],
         "link": "https://en.wikipedia.org/wiki/Timer"
     },
     {
@@ -841,7 +841,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "dates"],
+        "tags": ["utility", "dates"],
         "link": "https://en.wikipedia.org/wiki/Date_and_time_notation"
     },
     {
@@ -854,7 +854,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "timezone"],
+        "tags": ["utility", "timezone"],
         "link": "https://en.wikipedia.org/wiki/Time_zone"
     },
     {
@@ -867,7 +867,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "developer"],
+        "tags": ["utility", "unix"],
         "link": "https://en.wikipedia.org/wiki/Unix_time"
     },
     {
@@ -880,7 +880,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "age"],
+        "tags": ["utility", "birthday"],
         "link": "https://en.wikipedia.org/wiki/Age"
     },
     {
@@ -893,7 +893,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Time",
-        "tags": ["time", "utility", "countdown"],
+        "tags": ["utility", "countdown"],
         "link": "https://en.wikipedia.org/wiki/Countdown"
     },
     {
@@ -906,7 +906,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "edit"],
+        "tags": ["utility", "trim"],
         "link": "https://en.wikipedia.org/wiki/Audio_editing_software"
     },
     {
@@ -919,7 +919,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "merge"],
+        "tags": ["utility", "merge"],
         "link": "https://en.wikipedia.org/wiki/Audio_editing_software"
     },
     {
@@ -932,7 +932,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "volume"],
+        "tags": ["utility", "volume"],
         "link": "https://en.wikipedia.org/wiki/Audio_normalization"
     },
     {
@@ -945,7 +945,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "speed"],
+        "tags": ["utility", "speed"],
         "link": "https://en.wikipedia.org/wiki/Audio_time_stretching_and_pitch_scaling"
     },
     {
@@ -958,7 +958,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "effects"],
+        "tags": ["utility", "effects"],
         "link": "https://en.wikipedia.org/wiki/Backmasking"
     },
     {
@@ -971,7 +971,7 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "utility", "effects"],
+        "tags": ["utility", "effects"],
         "link": "https://en.wikipedia.org/wiki/Fade_(audio_engineering)"
     },
     {
@@ -984,7 +984,293 @@
         "dateCreated": "2024-12-26",
         "model": "Claude Opus 4.5",
         "category": "Audio",
-        "tags": ["audio", "visualization", "export"],
+        "tags": ["visualization", "export"],
         "link": "https://en.wikipedia.org/wiki/Waveform"
+    },
+    {
+        "id": "word-counter",
+        "title": "Word Counter",
+        "description": "Count words, characters, sentences, and paragraphs with reading time estimates.",
+        "path": "apps/word-counter/index.html",
+        "emoji": "📝",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "writing"],
+        "link": "https://en.wikipedia.org/wiki/Word_count"
+    },
+    {
+        "id": "case-converter",
+        "title": "Case Converter",
+        "description": "Convert text between lowercase, UPPERCASE, Title Case, camelCase, snake_case, and more.",
+        "path": "apps/case-converter/index.html",
+        "emoji": "🔤",
+        "previewGradient": "linear-gradient(135deg, #4ecdc4 0%, #556270 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "formatting"],
+        "link": "https://en.wikipedia.org/wiki/Letter_case"
+    },
+    {
+        "id": "lorem-generator",
+        "title": "Lorem Ipsum Generator",
+        "description": "Generate placeholder text in paragraphs, sentences, or words for design mockups.",
+        "path": "apps/lorem-generator/index.html",
+        "emoji": "📜",
+        "previewGradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "placeholder"],
+        "link": "https://en.wikipedia.org/wiki/Lorem_ipsum"
+    },
+    {
+        "id": "text-diff",
+        "title": "Text Diff",
+        "description": "Compare two texts side-by-side and highlight additions, deletions, and changes.",
+        "path": "apps/text-diff/index.html",
+        "emoji": "🔍",
+        "previewGradient": "linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "comparison"],
+        "link": "https://en.wikipedia.org/wiki/Diff"
+    },
+    {
+        "id": "remove-duplicates",
+        "title": "Remove Duplicate Lines",
+        "description": "Remove duplicate lines from text with options for case sensitivity and trimming.",
+        "path": "apps/remove-duplicates/index.html",
+        "emoji": "🧹",
+        "previewGradient": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "cleanup"],
+        "link": "https://en.wikipedia.org/wiki/Uniq"
+    },
+    {
+        "id": "sort-lines",
+        "title": "Sort Lines",
+        "description": "Sort text lines alphabetically, numerically, by length, or randomly.",
+        "path": "apps/sort-lines/index.html",
+        "emoji": "📊",
+        "previewGradient": "linear-gradient(135deg, #00b4db 0%, #0083b0 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Text",
+        "tags": ["utility", "sorting"],
+        "link": "https://en.wikipedia.org/wiki/Sort_(Unix)"
+    },
+    {
+        "id": "json-formatter",
+        "title": "JSON Formatter",
+        "description": "Format, validate, and minify JSON with syntax highlighting and error detection.",
+        "path": "apps/json-formatter/index.html",
+        "emoji": "{ }",
+        "previewGradient": "linear-gradient(135deg, #1a1a2e 0%, #4ecdc4 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["json", "formatting"],
+        "link": "https://en.wikipedia.org/wiki/JSON"
+    },
+    {
+        "id": "regex-tester",
+        "title": "Regex Tester",
+        "description": "Test regular expressions with live matching, capture groups, and common pattern library.",
+        "path": "apps/regex-tester/index.html",
+        "emoji": "🔣",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["regex", "testing"],
+        "link": "https://en.wikipedia.org/wiki/Regular_expression"
+    },
+    {
+        "id": "base64-encode",
+        "title": "Base64 Encoder",
+        "description": "Encode and decode Base64 text with URL-safe variant support.",
+        "path": "apps/base64-encode/index.html",
+        "emoji": "🔐",
+        "previewGradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["encoding", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Base64"
+    },
+    {
+        "id": "url-encode",
+        "title": "URL Encoder",
+        "description": "Encode and decode URL components with encodeURI and encodeURIComponent options.",
+        "path": "apps/url-encode/index.html",
+        "emoji": "🔗",
+        "previewGradient": "linear-gradient(135deg, #4ecdc4 0%, #556270 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["encoding", "url"],
+        "link": "https://en.wikipedia.org/wiki/Percent-encoding"
+    },
+    {
+        "id": "hash-generator",
+        "title": "Hash Generator",
+        "description": "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text input.",
+        "path": "apps/hash-generator/index.html",
+        "emoji": "#️⃣",
+        "previewGradient": "linear-gradient(135deg, #0c0c0c 0%, #4a00e0 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["security", "hashing"],
+        "link": "https://en.wikipedia.org/wiki/Cryptographic_hash_function"
+    },
+    {
+        "id": "jwt-decoder",
+        "title": "JWT Decoder",
+        "description": "Decode and inspect JSON Web Tokens to view header, payload, and expiration.",
+        "path": "apps/jwt-decoder/index.html",
+        "emoji": "🎟️",
+        "previewGradient": "linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Developer",
+        "tags": ["jwt", "security"],
+        "link": "https://en.wikipedia.org/wiki/JSON_Web_Token"
+    },
+    {
+        "id": "percentage-calc",
+        "title": "Percentage Calculator",
+        "description": "Calculate percentages with multiple modes: find %, what % of, increase/decrease by %.",
+        "path": "apps/percentage-calc/index.html",
+        "emoji": "%",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["percentage", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Percentage"
+    },
+    {
+        "id": "tip-calc",
+        "title": "Tip Calculator",
+        "description": "Calculate tips and split bills with customizable percentage and party size.",
+        "path": "apps/tip-calc/index.html",
+        "emoji": "💵",
+        "previewGradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["money", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Gratuity"
+    },
+    {
+        "id": "unit-converter",
+        "title": "Unit Converter",
+        "description": "Convert between units of length, weight, temperature, volume, area, speed, and data.",
+        "path": "apps/unit-converter/index.html",
+        "emoji": "📏",
+        "previewGradient": "linear-gradient(135deg, #4ecdc4 0%, #556270 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["conversion", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Conversion_of_units"
+    },
+    {
+        "id": "loan-calc",
+        "title": "Loan Calculator",
+        "description": "Calculate monthly payments, total interest, and amortization for loans.",
+        "path": "apps/loan-calc/index.html",
+        "emoji": "🏦",
+        "previewGradient": "linear-gradient(135deg, #00b4db 0%, #0083b0 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["finance", "loans"],
+        "link": "https://en.wikipedia.org/wiki/Loan"
+    },
+    {
+        "id": "bmi-calc",
+        "title": "BMI Calculator",
+        "description": "Calculate Body Mass Index with metric/imperial support and health category indicators.",
+        "path": "apps/bmi-calc/index.html",
+        "emoji": "⚖️",
+        "previewGradient": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["health", "fitness"],
+        "link": "https://en.wikipedia.org/wiki/Body_mass_index"
+    },
+    {
+        "id": "discount-calc",
+        "title": "Discount Calculator",
+        "description": "Calculate sale prices and savings with support for stacking multiple discounts.",
+        "path": "apps/discount-calc/index.html",
+        "emoji": "🏷️",
+        "previewGradient": "linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Calculator",
+        "tags": ["shopping", "money"],
+        "link": "https://en.wikipedia.org/wiki/Discounts_and_allowances"
+    },
+    {
+        "id": "color-picker",
+        "title": "Color Picker",
+        "description": "Pick colors and get values in HEX, RGB, HSL, HSV, and CMYK formats.",
+        "path": "apps/color-picker/index.html",
+        "emoji": "🎨",
+        "previewGradient": "linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #ffe66d 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Color",
+        "tags": ["design", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Color_picker"
+    },
+    {
+        "id": "palette-generator",
+        "title": "Palette Generator",
+        "description": "Generate color palettes using color theory: complementary, analogous, triadic, and more.",
+        "path": "apps/palette-generator/index.html",
+        "emoji": "🌈",
+        "previewGradient": "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Color",
+        "tags": ["design", "palette"],
+        "link": "https://en.wikipedia.org/wiki/Color_scheme"
+    },
+    {
+        "id": "contrast-checker",
+        "title": "Contrast Checker",
+        "description": "Check color contrast ratios for WCAG accessibility compliance (AA and AAA levels).",
+        "path": "apps/contrast-checker/index.html",
+        "emoji": "♿",
+        "previewGradient": "linear-gradient(135deg, #1a1a2e 0%, #ffffff 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Color",
+        "tags": ["accessibility", "wcag"],
+        "link": "https://en.wikipedia.org/wiki/Web_Content_Accessibility_Guidelines"
+    },
+    {
+        "id": "color-converter",
+        "title": "Color Converter",
+        "description": "Convert colors between HEX, RGB, HSL, HSV, and CMYK formats.",
+        "path": "apps/color-converter/index.html",
+        "emoji": "🔄",
+        "previewGradient": "linear-gradient(135deg, #4ecdc4 0%, #f093fb 100%)",
+        "dateCreated": "2024-12-26",
+        "model": "Claude Opus 4.5",
+        "category": "Color",
+        "tags": ["conversion", "utility"],
+        "link": "https://en.wikipedia.org/wiki/Color_model"
     }
 ]

@@ -125,29 +125,6 @@
             color: #888;
             margin-top: 8px;
         }
-        .progress-section {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-        .progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4ecdc4, #44a08d);
-            transition: width 0.3s;
-        }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -202,16 +179,6 @@
                     </div>
                 </div>
                 <div class="total-time" id="totalTime">-</div>
-
-                <div class="progress-section" id="progressSection">
-                    <div class="progress-label">
-                        <span>Progress</span>
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                </div>
             </div>
 
             <div class="past-event hidden" id="pastEvent">
@@ -226,12 +193,29 @@
         const eventNameInput = document.getElementById('eventName');
         const targetDateInput = document.getElementById('targetDate');
         const targetTimeInput = document.getElementById('targetTime');
-        let createdAt = Date.now();
+
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('event')) eventNameInput.value = params.get('event');
+            if (params.has('date')) targetDateInput.value = params.get('date');
+            if (params.has('time')) targetTimeInput.value = params.get('time');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('event', eventNameInput.value);
+            if (targetDateInput.value) params.set('date', targetDateInput.value);
+            if (targetTimeInput.value) params.set('time', targetTimeInput.value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
 
         // Set default to 7 days from now
         const defaultDate = new Date();
         defaultDate.setDate(defaultDate.getDate() + 7);
         targetDateInput.value = defaultDate.toISOString().split('T')[0];
+
+        loadFromURL();
 
         // Presets
         document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -267,14 +251,14 @@
                         eventNameInput.value = `Christmas ${christmasYear}`;
                         break;
                 }
-                createdAt = Date.now();
                 update();
+                updateURL();
             });
         });
 
-        eventNameInput.addEventListener('input', update);
-        targetDateInput.addEventListener('change', () => { createdAt = Date.now(); update(); });
-        targetTimeInput.addEventListener('change', () => { createdAt = Date.now(); update(); });
+        eventNameInput.addEventListener('input', () => { update(); updateURL(); });
+        targetDateInput.addEventListener('change', () => { update(); updateURL(); });
+        targetTimeInput.addEventListener('change', () => { update(); updateURL(); });
 
         function update() {
             const name = eventNameInput.value || 'Event';
@@ -325,14 +309,6 @@
                 const totalMinutes = Math.floor(diff / (1000 * 60));
                 document.getElementById('totalTime').innerHTML =
                     `<span>${totalHours.toLocaleString()}</span> hours or <span>${totalMinutes.toLocaleString()}</span> minutes remaining`;
-
-                // Progress
-                const totalDuration = target - createdAt;
-                const elapsed = now - createdAt;
-                const progress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-
-                document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
-                document.getElementById('progressFill').style.width = progress + '%';
             }
         }
 

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percentage Calculator - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .calc-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .calc-title {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .calc-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .calc-text {
+            color: #888;
+            font-size: 1rem;
+        }
+        input[type="number"] {
+            width: 100px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        input[type="number"]::placeholder { color: #444; }
+        .result-box {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 6px;
+            padding: 12px 20px;
+            min-width: 100px;
+            text-align: center;
+        }
+        .result-value {
+            color: #4ecdc4;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .equals {
+            color: #4ecdc4;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .common-percentages {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .common-title {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .quick-calc {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .quick-input {
+            flex: 1;
+            min-width: 150px;
+        }
+        .quick-input label {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        .quick-input input {
+            width: 100%;
+        }
+        .percentage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+        }
+        .percentage-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+        .percentage-label {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .percentage-value {
+            color: #4ecdc4;
+            font-size: 1.1rem;
+            font-weight: 500;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>Percentage Calculator</h1>
+        <p class="subtitle">Calculate percentages in multiple ways.</p>
+
+        <div class="calc-section">
+            <div class="calc-title">What is X% of Y?</div>
+            <div class="calc-row">
+                <span class="calc-text">What is</span>
+                <input type="number" id="percent1" placeholder="X" step="any">
+                <span class="calc-text">% of</span>
+                <input type="number" id="value1" placeholder="Y" step="any">
+                <span class="equals">=</span>
+                <div class="result-box">
+                    <div class="result-value" id="result1">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calc-section">
+            <div class="calc-title">X is what % of Y?</div>
+            <div class="calc-row">
+                <input type="number" id="part2" placeholder="X" step="any">
+                <span class="calc-text">is what % of</span>
+                <input type="number" id="whole2" placeholder="Y" step="any">
+                <span class="equals">=</span>
+                <div class="result-box">
+                    <div class="result-value" id="result2">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calc-section">
+            <div class="calc-title">X is Y% of what?</div>
+            <div class="calc-row">
+                <input type="number" id="part3" placeholder="X" step="any">
+                <span class="calc-text">is</span>
+                <input type="number" id="percent3" placeholder="Y" step="any">
+                <span class="calc-text">% of</span>
+                <span class="equals">=</span>
+                <div class="result-box">
+                    <div class="result-value" id="result3">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calc-section">
+            <div class="calc-title">Percentage change from X to Y</div>
+            <div class="calc-row">
+                <span class="calc-text">From</span>
+                <input type="number" id="from4" placeholder="X" step="any">
+                <span class="calc-text">to</span>
+                <input type="number" id="to4" placeholder="Y" step="any">
+                <span class="equals">=</span>
+                <div class="result-box">
+                    <div class="result-value" id="result4">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="common-percentages">
+            <div class="common-title">Quick Percentage Reference</div>
+            <div class="quick-calc">
+                <div class="quick-input">
+                    <label>Enter a number</label>
+                    <input type="number" id="quickValue" placeholder="100" step="any" value="100">
+                </div>
+            </div>
+            <div class="percentage-grid" id="percentageGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            if (isNaN(num) || !isFinite(num)) return '0';
+            return parseFloat(num.toFixed(4)).toString();
+        }
+
+        // Calculator 1: What is X% of Y?
+        function calc1() {
+            const percent = parseFloat(document.getElementById('percent1').value) || 0;
+            const value = parseFloat(document.getElementById('value1').value) || 0;
+            const result = (percent / 100) * value;
+            document.getElementById('result1').textContent = formatNumber(result);
+        }
+
+        // Calculator 2: X is what % of Y?
+        function calc2() {
+            const part = parseFloat(document.getElementById('part2').value) || 0;
+            const whole = parseFloat(document.getElementById('whole2').value) || 0;
+            const result = whole !== 0 ? (part / whole) * 100 : 0;
+            document.getElementById('result2').textContent = formatNumber(result) + '%';
+        }
+
+        // Calculator 3: X is Y% of what?
+        function calc3() {
+            const part = parseFloat(document.getElementById('part3').value) || 0;
+            const percent = parseFloat(document.getElementById('percent3').value) || 0;
+            const result = percent !== 0 ? (part / percent) * 100 : 0;
+            document.getElementById('result3').textContent = formatNumber(result);
+        }
+
+        // Calculator 4: Percentage change
+        function calc4() {
+            const from = parseFloat(document.getElementById('from4').value) || 0;
+            const to = parseFloat(document.getElementById('to4').value) || 0;
+            const result = from !== 0 ? ((to - from) / Math.abs(from)) * 100 : 0;
+            const sign = result > 0 ? '+' : '';
+            document.getElementById('result4').textContent = sign + formatNumber(result) + '%';
+        }
+
+        // Quick reference
+        function updateQuickReference() {
+            const value = parseFloat(document.getElementById('quickValue').value) || 0;
+            const percentages = [5, 10, 15, 20, 25, 30, 33.33, 50, 66.67, 75, 100, 150];
+
+            const grid = document.getElementById('percentageGrid');
+            grid.innerHTML = percentages.map(p => `
+                <div class="percentage-item">
+                    <div class="percentage-label">${p}%</div>
+                    <div class="percentage-value">${formatNumber((p / 100) * value)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        document.getElementById('percent1').addEventListener('input', calc1);
+        document.getElementById('value1').addEventListener('input', calc1);
+
+        document.getElementById('part2').addEventListener('input', calc2);
+        document.getElementById('whole2').addEventListener('input', calc2);
+
+        document.getElementById('part3').addEventListener('input', calc3);
+        document.getElementById('percent3').addEventListener('input', calc3);
+
+        document.getElementById('from4').addEventListener('input', calc4);
+        document.getElementById('to4').addEventListener('input', calc4);
+
+        document.getElementById('quickValue').addEventListener('input', updateQuickReference);
+
+        // Initialize
+        updateQuickReference();
+    </script>
+</body>
+</html>

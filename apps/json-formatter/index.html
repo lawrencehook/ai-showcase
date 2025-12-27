@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); z-index: 100;
+        }
+        .back-link:hover { color: #fff; }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+        }
+        .toolbar-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .toolbar-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .toolbar-btn.primary {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+        }
+        .toolbar-btn.primary:hover { background: rgba(78, 205, 196, 0.3); }
+        .indent-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .spacer { flex: 1; }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-badge.valid { background: rgba(78, 205, 196, 0.2); color: #4ecdc4; }
+        .status-badge.invalid { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+        .status-badge.empty { background: rgba(255,255,255,0.05); color: #666; }
+        .editors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 900px) {
+            .editors { grid-template-columns: 1fr; }
+        }
+        .editor-panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-panel.error { border-color: rgba(255, 107, 107, 0.5); }
+        .editor-header {
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .editor-title { color: #888; font-size: 0.85rem; }
+        .copy-btn {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            color: #4ecdc4;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { background: rgba(78, 205, 196, 0.3); }
+        textarea {
+            flex: 1;
+            min-height: 500px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+        .error-message {
+            padding: 12px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border-top: 1px solid rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        .json-string { color: #98c379; }
+        .json-number { color: #d19a66; }
+        .json-boolean { color: #56b6c2; }
+        .json-null { color: #c678dd; }
+        .json-key { color: #e06c75; }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>JSON Formatter</h1>
+        <p class="subtitle">Format, validate, and minify JSON data.</p>
+
+        <div class="toolbar">
+            <button class="toolbar-btn primary" id="formatBtn">Format</button>
+            <button class="toolbar-btn" id="minifyBtn">Minify</button>
+            <select class="indent-select" id="indentSelect">
+                <option value="2">2 spaces</option>
+                <option value="4">4 spaces</option>
+                <option value="tab">Tab</option>
+            </select>
+            <button class="toolbar-btn" id="clearBtn">Clear</button>
+            <button class="toolbar-btn" id="sampleBtn">Load Sample</button>
+            <span class="spacer"></span>
+            <span class="status-badge empty" id="statusBadge">Empty</span>
+        </div>
+
+        <div class="editors">
+            <div class="editor-panel" id="inputPanel">
+                <div class="editor-header">
+                    <span class="editor-title">Input JSON</span>
+                </div>
+                <textarea id="inputText" placeholder='Paste your JSON here...
+
+Example:
+{"name":"John","age":30,"city":"New York"}'></textarea>
+                <div class="error-message" id="errorMessage" style="display: none;"></div>
+            </div>
+            <div class="editor-panel">
+                <div class="editor-header">
+                    <span class="editor-title">Formatted Output</span>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                </div>
+                <textarea id="outputText" readonly placeholder="Formatted JSON will appear here..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const statusBadge = document.getElementById('statusBadge');
+        const errorMessage = document.getElementById('errorMessage');
+        const inputPanel = document.getElementById('inputPanel');
+
+        function getIndent() {
+            const val = document.getElementById('indentSelect').value;
+            return val === 'tab' ? '\t' : parseInt(val);
+        }
+
+        function validate() {
+            const text = inputText.value.trim();
+
+            if (!text) {
+                statusBadge.className = 'status-badge empty';
+                statusBadge.textContent = 'Empty';
+                errorMessage.style.display = 'none';
+                inputPanel.classList.remove('error');
+                outputText.value = '';
+                return null;
+            }
+
+            try {
+                const parsed = JSON.parse(text);
+                statusBadge.className = 'status-badge valid';
+                statusBadge.textContent = 'Valid JSON';
+                errorMessage.style.display = 'none';
+                inputPanel.classList.remove('error');
+                return parsed;
+            } catch (e) {
+                statusBadge.className = 'status-badge invalid';
+                statusBadge.textContent = 'Invalid JSON';
+                errorMessage.textContent = e.message;
+                errorMessage.style.display = 'block';
+                inputPanel.classList.add('error');
+                outputText.value = '';
+                return null;
+            }
+        }
+
+        function format() {
+            const parsed = validate();
+            if (parsed !== null) {
+                outputText.value = JSON.stringify(parsed, null, getIndent());
+            }
+        }
+
+        function minify() {
+            const parsed = validate();
+            if (parsed !== null) {
+                outputText.value = JSON.stringify(parsed);
+            }
+        }
+
+        inputText.addEventListener('input', () => {
+            validate();
+        });
+
+        document.getElementById('formatBtn').addEventListener('click', format);
+        document.getElementById('minifyBtn').addEventListener('click', minify);
+        document.getElementById('indentSelect').addEventListener('change', format);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+            validate();
+        });
+
+        document.getElementById('sampleBtn').addEventListener('click', () => {
+            inputText.value = JSON.stringify({
+                "name": "John Doe",
+                "age": 30,
+                "email": "john@example.com",
+                "isActive": true,
+                "balance": null,
+                "address": {
+                    "street": "123 Main St",
+                    "city": "New York",
+                    "zipCode": "10001"
+                },
+                "hobbies": ["reading", "gaming", "hiking"],
+                "orders": [
+                    { "id": 1, "product": "Laptop", "price": 999.99 },
+                    { "id": 2, "product": "Phone", "price": 699.99 }
+                ]
+            });
+            format();
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputText.value);
+            document.getElementById('copyBtn').textContent = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copyBtn').textContent = 'Copy';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

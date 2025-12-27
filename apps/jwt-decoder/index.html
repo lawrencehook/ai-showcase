@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Decoder - AI Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .subtitle { color: #666; margin-bottom: 32px; }
+        .back-link {
+            position: fixed; top: 20px; right: 20px; color: #666; text-decoration: none;
+            font-size: 14px; padding: 8px 14px; background: rgba(0,0,0,0.85);
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-link:hover { color: #fff; }
+        .input-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .input-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-title { color: #888; font-size: 0.9rem; }
+        .sample-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .sample-btn:hover { color: #fff; }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'SF Mono', Monaco, monospace;
+            word-break: break-all;
+        }
+        textarea:focus { outline: none; }
+        textarea::placeholder { color: #444; }
+        .error-message {
+            padding: 12px 16px;
+            background: rgba(255, 107, 107, 0.1);
+            border-top: 1px solid rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .jwt-visual {
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        .jwt-header-part { color: #ff6b6b; }
+        .jwt-payload-part { color: #c678dd; }
+        .jwt-signature-part { color: #4ecdc4; }
+        .jwt-dot { color: #888; }
+        .decoded-sections {
+            display: grid;
+            gap: 16px;
+        }
+        .decoded-section {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .decoded-section.header { border-left: 3px solid #ff6b6b; }
+        .decoded-section.payload { border-left: 3px solid #c678dd; }
+        .decoded-section.signature { border-left: 3px solid #4ecdc4; }
+        .section-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title { font-weight: 500; font-size: 0.9rem; }
+        .section-title.header { color: #ff6b6b; }
+        .section-title.payload { color: #c678dd; }
+        .section-title.signature { color: #4ecdc4; }
+        .copy-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { color: #fff; }
+        .section-content {
+            padding: 16px;
+        }
+        .json-content {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .json-key { color: #e06c75; }
+        .json-string { color: #98c379; }
+        .json-number { color: #d19a66; }
+        .json-boolean { color: #56b6c2; }
+        .claim-info {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .claim-item {
+            display: flex;
+            gap: 12px;
+            padding: 6px 0;
+            font-size: 0.85rem;
+        }
+        .claim-name { color: #666; min-width: 80px; }
+        .claim-value { color: #e0e0e0; }
+        .claim-value.expired { color: #ff6b6b; }
+        .claim-value.valid { color: #4ecdc4; }
+        .signature-note {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" class="back-link">← Back</a>
+    <div class="container">
+        <h1>JWT Decoder</h1>
+        <p class="subtitle">Decode and inspect JSON Web Tokens (JWT) without verification.</p>
+
+        <div class="input-section">
+            <div class="input-header">
+                <span class="input-title">Paste JWT Token</span>
+                <button class="sample-btn" id="sampleBtn">Load Sample</button>
+            </div>
+            <textarea id="jwtInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"></textarea>
+            <div class="jwt-visual" id="jwtVisual"></div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="decoded-sections" id="decodedSections">
+            <div class="decoded-section header">
+                <div class="section-header">
+                    <span class="section-title header">HEADER</span>
+                    <button class="copy-btn" id="copyHeader">Copy</button>
+                </div>
+                <div class="section-content">
+                    <div class="json-content" id="headerContent">-</div>
+                </div>
+            </div>
+
+            <div class="decoded-section payload">
+                <div class="section-header">
+                    <span class="section-title payload">PAYLOAD</span>
+                    <button class="copy-btn" id="copyPayload">Copy</button>
+                </div>
+                <div class="section-content">
+                    <div class="json-content" id="payloadContent">-</div>
+                    <div class="claim-info" id="claimInfo" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="decoded-section signature">
+                <div class="section-header">
+                    <span class="section-title signature">SIGNATURE</span>
+                </div>
+                <div class="section-content">
+                    <div id="signatureContent">-</div>
+                    <p class="signature-note">Note: Signature is not verified. This tool only decodes the token.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const jwtInput = document.getElementById('jwtInput');
+        const jwtVisual = document.getElementById('jwtVisual');
+        const errorMessage = document.getElementById('errorMessage');
+        const headerContent = document.getElementById('headerContent');
+        const payloadContent = document.getElementById('payloadContent');
+        const signatureContent = document.getElementById('signatureContent');
+        const claimInfo = document.getElementById('claimInfo');
+
+        let decodedHeader = null;
+        let decodedPayload = null;
+
+        function base64UrlDecode(str) {
+            // Add padding
+            str = str.replace(/-/g, '+').replace(/_/g, '/');
+            while (str.length % 4) {
+                str += '=';
+            }
+            return decodeURIComponent(escape(atob(str)));
+        }
+
+        function formatJson(obj) {
+            return JSON.stringify(obj, null, 2)
+                .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+                .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
+                .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')
+                .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>');
+        }
+
+        function formatTimestamp(ts) {
+            const date = new Date(ts * 1000);
+            return date.toLocaleString();
+        }
+
+        function decodeJwt() {
+            const token = jwtInput.value.trim();
+            errorMessage.style.display = 'none';
+
+            if (!token) {
+                jwtVisual.innerHTML = '<span style="color: #444;">Token visualization will appear here</span>';
+                headerContent.textContent = '-';
+                payloadContent.textContent = '-';
+                signatureContent.textContent = '-';
+                claimInfo.style.display = 'none';
+                return;
+            }
+
+            const parts = token.split('.');
+
+            if (parts.length !== 3) {
+                errorMessage.textContent = 'Invalid JWT format. A JWT should have 3 parts separated by dots.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Visualize parts
+            jwtVisual.innerHTML = `<span class="jwt-header-part">${parts[0]}</span><span class="jwt-dot">.</span><span class="jwt-payload-part">${parts[1]}</span><span class="jwt-dot">.</span><span class="jwt-signature-part">${parts[2]}</span>`;
+
+            try {
+                // Decode header
+                decodedHeader = JSON.parse(base64UrlDecode(parts[0]));
+                headerContent.innerHTML = formatJson(decodedHeader);
+
+                // Decode payload
+                decodedPayload = JSON.parse(base64UrlDecode(parts[1]));
+                payloadContent.innerHTML = formatJson(decodedPayload);
+
+                // Show claim info
+                const claims = [];
+                const now = Math.floor(Date.now() / 1000);
+
+                if (decodedPayload.iat) {
+                    claims.push({
+                        name: 'Issued At',
+                        value: formatTimestamp(decodedPayload.iat)
+                    });
+                }
+
+                if (decodedPayload.exp) {
+                    const isExpired = decodedPayload.exp < now;
+                    claims.push({
+                        name: 'Expires',
+                        value: formatTimestamp(decodedPayload.exp) + (isExpired ? ' (EXPIRED)' : ' (Valid)'),
+                        class: isExpired ? 'expired' : 'valid'
+                    });
+                }
+
+                if (decodedPayload.nbf) {
+                    const isValid = decodedPayload.nbf <= now;
+                    claims.push({
+                        name: 'Not Before',
+                        value: formatTimestamp(decodedPayload.nbf) + (isValid ? '' : ' (Not yet valid)'),
+                        class: isValid ? 'valid' : 'expired'
+                    });
+                }
+
+                if (decodedPayload.sub) {
+                    claims.push({ name: 'Subject', value: decodedPayload.sub });
+                }
+
+                if (decodedPayload.iss) {
+                    claims.push({ name: 'Issuer', value: decodedPayload.iss });
+                }
+
+                if (decodedPayload.aud) {
+                    claims.push({ name: 'Audience', value: Array.isArray(decodedPayload.aud) ? decodedPayload.aud.join(', ') : decodedPayload.aud });
+                }
+
+                if (claims.length > 0) {
+                    claimInfo.innerHTML = claims.map(c => `
+                        <div class="claim-item">
+                            <span class="claim-name">${c.name}:</span>
+                            <span class="claim-value ${c.class || ''}">${c.value}</span>
+                        </div>
+                    `).join('');
+                    claimInfo.style.display = 'block';
+                } else {
+                    claimInfo.style.display = 'none';
+                }
+
+                // Signature (just show base64)
+                signatureContent.innerHTML = `<code style="word-break: break-all; color: #4ecdc4;">${parts[2]}</code>`;
+
+            } catch (e) {
+                errorMessage.textContent = 'Error decoding token: ' + e.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        jwtInput.addEventListener('input', decodeJwt);
+
+        document.getElementById('sampleBtn').addEventListener('click', () => {
+            // Generate a sample JWT (this is not a real signed token)
+            const header = { alg: 'HS256', typ: 'JWT' };
+            const payload = {
+                sub: '1234567890',
+                name: 'John Doe',
+                email: 'john@example.com',
+                role: 'admin',
+                iat: Math.floor(Date.now() / 1000) - 3600,
+                exp: Math.floor(Date.now() / 1000) + 3600
+            };
+
+            const encodeBase64Url = (obj) => {
+                return btoa(JSON.stringify(obj))
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+            };
+
+            const headerB64 = encodeBase64Url(header);
+            const payloadB64 = encodeBase64Url(payload);
+            const signature = 'SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+            jwtInput.value = `${headerB64}.${payloadB64}.${signature}`;
+            decodeJwt();
+        });
+
+        document.getElementById('copyHeader').addEventListener('click', () => {
+            if (decodedHeader) {
+                navigator.clipboard.writeText(JSON.stringify(decodedHeader, null, 2));
+            }
+        });
+
+        document.getElementById('copyPayload').addEventListener('click', () => {
+            if (decodedPayload) {
+                navigator.clipboard.writeText(JSON.stringify(decodedPayload, null, 2));
+            }
+        });
+    </script>
+</body>
+</html>

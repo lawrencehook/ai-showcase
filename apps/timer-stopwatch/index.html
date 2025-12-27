@@ -217,6 +217,32 @@
     </div>
 
     <script>
+        // URL parameter handling
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('mode')) {
+                const mode = params.get('mode');
+                document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+                document.getElementById('stopwatchPanel').classList.toggle('hidden', mode !== 'stopwatch');
+                document.getElementById('timerPanel').classList.toggle('hidden', mode !== 'timer');
+            }
+            if (params.has('h')) document.getElementById('timerHours').value = params.get('h');
+            if (params.has('m')) document.getElementById('timerMinutes').value = params.get('m');
+            if (params.has('s')) document.getElementById('timerSeconds').value = params.get('s');
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            const activeTab = document.querySelector('.tab.active');
+            params.set('mode', activeTab ? activeTab.dataset.mode : 'stopwatch');
+            params.set('h', document.getElementById('timerHours').value);
+            params.set('m', document.getElementById('timerMinutes').value);
+            params.set('s', document.getElementById('timerSeconds').value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
+        loadFromURL();
+
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -225,6 +251,7 @@
                 const mode = tab.dataset.mode;
                 document.getElementById('stopwatchPanel').classList.toggle('hidden', mode !== 'stopwatch');
                 document.getElementById('timerPanel').classList.toggle('hidden', mode !== 'timer');
+                updateURL();
             });
         });
 
@@ -326,11 +353,12 @@
                 document.getElementById('timerMinutes').value = Math.floor((seconds % 3600) / 60);
                 document.getElementById('timerSeconds').value = seconds % 60;
                 updateTimerDisplay();
+                updateURL();
             });
         });
 
         ['timerHours', 'timerMinutes', 'timerSeconds'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateTimerDisplay);
+            document.getElementById(id).addEventListener('input', () => { updateTimerDisplay(); updateURL(); });
         });
 
         function getTimerSeconds() {
